@@ -7,10 +7,20 @@
    <extension-point id="thisresolver" name="This scope resolver" schema="schema/thisresolver.exsd"/>
    <extension-point id="functionreturntype" name="Function Return Type Resolver" schema="schema/functionreturntype.exsd"/>
    <extension-point id="otypedef" name="OType definition resolver" schema="schema/otypedef.exsd"/>
-
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            file-extensions="js"
+            base-type="org.eclipse.core.runtime.text"
+            id="org.eclipse.dltk.mod.vjoContentType"
+            name="%vjoContentType"
+            priority="high">
+      </content-type>
+   </extension>
    <extension
          id="org.ebayopensource.vjet.core.nature"
          name="%vjetNature"
+         content-type="org.eclipse.dltk.mod.vjoContentType"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
@@ -18,15 +28,7 @@
          </run>
       </runtime>
    </extension>
-   <extension
-         point="org.eclipse.core.runtime.contentTypes">
-      <content-type
-            file-extensions="js"
-            id="org.eclipse.dltk.mod.vjoContentType"
-            name="%vjoContentType"
-            priority="high">
-      </content-type>
-   </extension>
+
    <extension
          point="org.eclipse.dltk.mod.core.language">
       <language

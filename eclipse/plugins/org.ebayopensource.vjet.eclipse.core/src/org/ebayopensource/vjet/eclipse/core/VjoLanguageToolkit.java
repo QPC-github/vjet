@@ -75,8 +75,17 @@ public class VjoLanguageToolkit extends AbstractLanguageToolkit {
 	 */
 	public static boolean isVjetContentType(IFile file) {
 		IContentType type1 = getVjetContentType();
-		IContentType type = Platform.getContentTypeManager().findContentTypeFor(file.getName());
-		return type != null && type.isKindOf(type1);
+		IContentType[] type = Platform.getContentTypeManager().findContentTypesFor(file.getName());
+		
+		boolean isKind = false;
+		for (IContentType iContentType : type) {
+			if(iContentType.isKindOf(type1)){
+				isKind = true;
+				break;
+			}
+		}
+		
+		return type != null && isKind;
 	}
 	
 	// add by patrick

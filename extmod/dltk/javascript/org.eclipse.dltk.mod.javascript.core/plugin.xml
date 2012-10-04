@@ -16,12 +16,6 @@
       </runtime>
    </extension> 
    
-   <extension
-         point="org.eclipse.dltk.mod.core.language">
-      <language
-            class="org.eclipse.dltk.mod.javascript.core.JavaScriptLanguageToolkit"
-            nature="org.eclipse.dltk.mod.javascript.core.nature"/>
-</extension>
 
    <extension
          point="org.eclipse.dltk.mod.javascript.core.resolver">
