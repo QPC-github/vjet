@@ -33,7 +33,7 @@ public final class LibManager {
 	private IResourceResolver m_resourceResolver = ResourceHelper.getInstance();
 	private IJstSerializer m_jstSerializer = JstTypeSerializer.getInstance();
 	
-	public static final String JS_NATIVE_LIB_NAME = "JsNative";
+	public static final String JS_NATIVE_LIB_NAME = "JsNativeLib";
 	public static final String JS_NATIVE_GLOBAL_LIB_NAME = "JsNativeGlobal";
 	public static final String JAVA_PRIMITIVE_LIB_NAME = "JavaPrimitive";
 	public static final String VJO_JAVA_LIB_NAME = "VjoJavaLib";

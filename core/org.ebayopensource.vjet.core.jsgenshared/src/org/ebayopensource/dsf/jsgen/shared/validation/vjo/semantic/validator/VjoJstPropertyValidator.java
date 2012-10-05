@@ -24,10 +24,14 @@ import org.ebayopensource.dsf.jst.IInferred;
 import org.ebayopensource.dsf.jst.IJstNode;
 import org.ebayopensource.dsf.jst.IJstProperty;
 import org.ebayopensource.dsf.jst.IJstType;
+import org.ebayopensource.dsf.jst.declaration.JstArray;
 import org.ebayopensource.dsf.jst.declaration.JstProperty;
+import org.ebayopensource.dsf.jst.declaration.SynthOlType;
+import org.ebayopensource.dsf.jst.expr.JstArrayInitializer;
 import org.ebayopensource.dsf.jst.meta.BaseJsCommentMetaNode;
 import org.ebayopensource.dsf.jst.term.SimpleLiteral;
 import org.ebayopensource.dsf.jst.token.IExpr;
+import org.ebayopensource.vjo.lib.LibManager;
 
 public class VjoJstPropertyValidator 
 	extends VjoSemanticValidator
@@ -200,7 +204,9 @@ public class VjoJstPropertyValidator
 		//check if expr's value type is ready to use
 		//actually, only js native types could be used here
 		final IJstType propertyExprResultType = propertyExpr.getResultType();
-        if(ctx.getUninitializedTypes().contains(propertyExprResultType) || propertyExprResultType == null){
+		if(!isNative(propertyExprResultType) || propertyExprResultType == null){
+		
+//        if(ctx.getUninitializedTypes().contains(propertyExprResultType) || propertyExprResultType == null){
             final BaseVjoSemanticRuleCtx ruleCtx = new BaseVjoSemanticRuleCtx(property, ctx.getGroupId(), new String[]{property.getName().getName(),
                 propertyExprResultType != null ? propertyExprResultType.getName() : property.getInitializer().toExprText()});
             satisfyRule(ctx, VjoSemanticRuleRepo.getInstance().CANNOT_USE_UNINTIALIZED_TYPE, ruleCtx);
@@ -208,6 +214,29 @@ public class VjoJstPropertyValidator
         }
 		
 		return true;
+	}
+
+	private boolean isNative(IJstType propertyExprResultType) {
+		if(propertyExprResultType instanceof SynthOlType){
+			return true;
+		}
+		if(propertyExprResultType instanceof JstArrayInitializer || propertyExprResultType instanceof JstArray){
+			return true;
+		}
+		if(propertyExprResultType==null || propertyExprResultType.getPackage()==null){
+			return false;
+		}
+		String groupName = propertyExprResultType.getPackage().getGroupName();
+
+		if(groupName.equals(LibManager.JS_NATIVE_GLOBAL_LIB_NAME) || 
+				groupName.equals("JsBrowserLib") ||
+				groupName.equals(LibManager.JS_NATIVE_LIB_NAME)||
+				groupName.equals(LibManager.VJO_SELF_DESCRIBED)||
+				groupName.equals(LibManager.JAVA_PRIMITIVE_LIB_NAME)){
+			return true;
+		}
+		
+		return false;
 	}
 
 	protected void validatePropertyType(final VjoValidationCtx ctx,
