@@ -10,9 +10,6 @@ package org.ebayopensource.vjet.eclipse.core.ts;
 
 import java.util.List;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-
 import org.ebayopensource.dsf.jst.BaseJstNode;
 import org.ebayopensource.dsf.jst.IJstMethod;
 import org.ebayopensource.dsf.jst.IJstNode;
@@ -25,6 +22,9 @@ import org.ebayopensource.dsf.jst.term.JstIdentifier;
 import org.ebayopensource.dsf.ts.type.TypeName;
 import org.ebayopensource.vjet.eclipse.core.test.parser.AbstractVjoModelTests;
 import org.ebayopensource.vjo.tool.typespace.TypeSpaceMgr;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.junit.Before;
 
 public class ExpressionTypeLinkerTests extends AbstractVjoModelTests {
 	
@@ -36,7 +36,7 @@ public class ExpressionTypeLinkerTests extends AbstractVjoModelTests {
 	
 	private TypeSpaceMgr mgr = TypeSpaceMgr.getInstance();
 	
-	// @Before
+	 @Before
 	public void setUp() {
 		setWorkspaceSufix("1");
 		IProject project = getWorkspaceRoot().getProject(getTestProjectName());
