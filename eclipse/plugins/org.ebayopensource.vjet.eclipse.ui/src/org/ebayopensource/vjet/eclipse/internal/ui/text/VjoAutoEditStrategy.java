@@ -385,10 +385,11 @@ public class VjoAutoEditStrategy extends DefaultIndentLineAutoEditStrategy {
 
 				// copy old content of line behind insertion point to new line
 				// unless we think we are inserting an anonymous type definition
+				buf.append('}');
 				copyContent(d, c, buf, lineEnd, contentStart);
 
 				appendReference(d, c, indenter, buf, lineEnd, start);
-				buf.append('}');
+				
 			}
 
 			// deleted below code, use VjoDocIndentStrategy instead.
