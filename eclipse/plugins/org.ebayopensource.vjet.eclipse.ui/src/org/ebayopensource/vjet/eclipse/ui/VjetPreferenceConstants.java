@@ -22,6 +22,7 @@ import org.eclipse.dltk.mod.ui.CodeFormatterConstants;
 import org.eclipse.dltk.mod.ui.DLTKUIPlugin;
 import org.eclipse.dltk.mod.ui.PreferenceConstants;
 import org.eclipse.dltk.mod.ui.preferences.NewScriptProjectPreferencePage;
+import org.eclipse.dltk.mod.ui.text.DLTKColorConstants;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
@@ -704,6 +705,8 @@ public class VjetPreferenceConstants extends PreferenceConstants {
 	public static final String CODEASSIST_USETHISVJ$ = "use_this.vj$";
 	public static final String CODEASSIST_APPENDCOMMENT = "append_annotion";
 	public static final String CODEASSIST_CAMEL_MATCH = "camel_match";
+
+	public static final String EDITOR_DEFAULT_COLOR = DLTKColorConstants.DLTK_DEFAULT;
 	
 	
 }

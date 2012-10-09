@@ -64,6 +64,7 @@ public class VjetEditorColoringConfigurationBlock extends
 			{ PreferencesMessages.DLTKEditorPreferencePage_singleLineComment,
 					VjetPreferenceConstants.EDITOR_SINGLE_LINE_COMMENT_COLOR,
 					sCommentsCategory },
+			
 			{ "Multi-line comment",
 						VjetPreferenceConstants.EDITOR_MULTI_LINE_COMMENT_COLOR,
 						sCommentsCategory },
@@ -80,9 +81,13 @@ public class VjetEditorColoringConfigurationBlock extends
 			{ PreferencesMessages.DLTKEditorPreferencePage_regexps,
 					VjetPreferenceConstants.EDITOR_REGEXP_CORE_COLOR,
 					sCoreCategory },
+					
+			{ PreferencesMessages.DLTKEditorPreferencePage_default,
+						VjetPreferenceConstants.EDITOR_DEFAULT_COLOR, sCoreCategory },
+						
 
-//			{ PreferencesMessages.DLTKEditorPreferencePage_numbers,
-//					VjetPreferenceConstants.EDITOR_NUMBER_COLOR, sCoreCategory },
+			{ PreferencesMessages.DLTKEditorPreferencePage_numbers,
+					VjetPreferenceConstants.EDITOR_NUMBER_COLOR, sCoreCategory },
 
 //			{ PreferencesMessages.DLTKEditorPreferencePage_function_colors,
 //					VjetPreferenceConstants.EDITOR_FUNCTION_DEFINITION_COLOR,
