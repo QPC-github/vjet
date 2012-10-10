@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ebayopensource.dsf.jst.IJstNode;
+import org.ebayopensource.dsf.jst.JstSource;
 import org.ebayopensource.dsf.jst.declaration.JstMethod;
 import org.ebayopensource.vjet.eclipse.core.IVjoSourceModule;
 import org.ebayopensource.vjet.eclipse.core.ts.GenericVisitor;
@@ -146,8 +147,12 @@ public class VjoSemanticHighlightingReconciler implements
 				VjoSemanticHighlighting semanticHighlighting = (VjoSemanticHighlighting) fJobSemanticHighlightings[i];
 				if (fJobHighlightings[i].isEnabled()
 						&& semanticHighlighting.consumes(fToken)) {
-					int offset = node.getName().getSource().getStartOffSet();
-					int length = node.getName().getSource().getLength();
+					JstSource source = node.getName().getSource();
+					if(source==null){
+						continue;
+					}
+					int offset = source.getStartOffSet();
+					int length = source.getLength();
 					if (offset > -1 && length > 0)
 						addPosition(offset, length, fJobHighlightings[i]);
 					break;
