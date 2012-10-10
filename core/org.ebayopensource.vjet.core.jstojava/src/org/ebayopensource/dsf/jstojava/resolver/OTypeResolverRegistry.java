@@ -127,6 +127,10 @@ public class OTypeResolverRegistry {
 		return m_resolvers.containsKey(key);
 	}
 	
+	public boolean hasResolvers(){
+		return !m_resolvers.isEmpty();
+	}
+	
 	public void clear(String groupId) {
 		for (List<IOTypeResolver> resolverList : m_resolvers.values()) {
 			for (int i = resolverList.size() - 1; i >=0; i--) {
