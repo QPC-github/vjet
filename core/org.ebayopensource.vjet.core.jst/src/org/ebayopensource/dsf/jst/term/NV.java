@@ -57,6 +57,9 @@ public final class NV extends BaseJstNode implements Serializable {
 	// API
 	//
 	public String getName() {
+		if(m_name==null){
+			return null;
+		}
 		return m_name.getName();
 	}
 	
