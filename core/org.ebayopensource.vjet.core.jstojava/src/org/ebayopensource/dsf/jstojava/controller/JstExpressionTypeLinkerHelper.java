@@ -2390,7 +2390,11 @@ public class JstExpressionTypeLinkerHelper {
 			 IJstType otype, final IJstVisitor revisitor) {
 		
 		
-		otype = resolveOtype(objLiteral);
+		IJstType override = resolveOtype(objLiteral);
+		
+		if(otype==null && override!=null){
+			otype = override;
+		}
 		
 		// support nested obj literals
 		if(otype != null && (otype instanceof SynthOlType) ){
