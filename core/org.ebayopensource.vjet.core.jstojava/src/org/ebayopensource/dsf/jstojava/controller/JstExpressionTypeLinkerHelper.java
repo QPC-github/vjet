@@ -2390,38 +2390,16 @@ public class JstExpressionTypeLinkerHelper {
 			 IJstType otype, final IJstVisitor revisitor) {
 		
 		
-		OTypeResolverRegistry otypeResolver = OTypeResolverRegistry.getInstance();
-	
-		if(objLiteral.getNVs().size()>0){
-			NV firstPosition = objLiteral.getNVs().get(0);
-			String key = firstPosition.getName();
-			if(otypeResolver.hasResolver(key)){
-				
-				otype = otypeResolver.resolve(key, firstPosition);
-				if(otype instanceof JstAttributedType){
-					JstAttributedType atype =(JstAttributedType)otype;
-					final String attributeName = atype.getAttributeName();
-					if (atype.isOType()) {
-						final IJstType objLiteralOrFunctionRefType = atype
-								.getOType(attributeName);
-						if (objLiteralOrFunctionRefType != null) {
-							otype = objLiteralOrFunctionRefType;
-						}
-					} 
-				}
-				
-			//	synthOlType.addResolvedOType(otype);
-			}
-		}
+		otype = resolveOtype(objLiteral);
 		
 		// support nested obj literals
 		if(otype != null && (otype instanceof SynthOlType) ){
 			objLiteral.setJstType(otype);	
 		}
-		else if (otype != null && (otype instanceof JstObjectLiteralType)) {
+		else if (synthOlType !=null && otype != null && (otype instanceof JstObjectLiteralType)) {
 			synthOlType.addResolvedOType(otype);
 		}else{
-    		return;
+    		// do nothing?
 		}
 		
 		// now we traverse the object literal to look 4 further bindings like:
@@ -2429,13 +2407,50 @@ public class JstExpressionTypeLinkerHelper {
 		for (NV nv : objLiteral.getNVs()) {
 			final JstIdentifier id = nv.getIdentifier();
 			final String name = id.getName();
-			doObjLiteralNameBinding(otype, id, name);
-
-			final IExpr valueExpr = nv.getValue();
-			if (valueExpr != null) {
-				doObjLiteralValueBinding(otype, revisitor, name, valueExpr);
+			if(otype!=null){
+				doObjLiteralNameBinding(otype, id, name);
+	
+				final IExpr valueExpr = nv.getValue();
+				if (valueExpr != null) {
+					doObjLiteralValueBinding(otype, revisitor, name, valueExpr);
+				}
 			}
 		}
+	}
+
+	private static IJstType resolveOtype(ObjLiteral objLiteral) {
+		
+		
+		 IJstType otype = null;
+		OTypeResolverRegistry otypeResolver = OTypeResolverRegistry.getInstance();
+		
+		if(objLiteral.getNVs().size()>0){
+			Set<String> keys = OTypeResolverRegistry.getInstance().getKeys();
+			for (String field : keys) {
+				NV firstPosition =objLiteral.getNV(field);
+				if(firstPosition==null){
+					return null;
+				}
+				String key = firstPosition.getName();
+				if(otypeResolver.hasResolver(key)){
+					
+					otype = otypeResolver.resolve(key, firstPosition);
+					if(otype instanceof JstAttributedType){
+						JstAttributedType atype =(JstAttributedType)otype;
+						final String attributeName = atype.getAttributeName();
+						if (atype.isOType()) {
+							final IJstType objLiteralOrFunctionRefType = atype
+									.getOType(attributeName);
+							if (objLiteralOrFunctionRefType != null) {
+								otype = objLiteralOrFunctionRefType;
+							}
+						} 
+					}
+				}
+			}
+			
+		}
+		return otype;
 	}
 
 	private static void doObjLiteralNameBinding(final IJstType otype,

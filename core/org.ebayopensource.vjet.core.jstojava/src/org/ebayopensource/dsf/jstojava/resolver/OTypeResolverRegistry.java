@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.ebayopensource.dsf.jst.IJstType;
 import org.ebayopensource.dsf.jst.meta.JsTypingMeta;
@@ -147,5 +148,9 @@ public class OTypeResolverRegistry {
 	
 	public void clearAll() {
 		m_resolvers.clear();
+	}
+
+	public Set<String> getKeys() {
+		return m_resolvers.keySet();
 	}
 }

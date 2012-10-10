@@ -86,6 +86,7 @@ import org.ebayopensource.dsf.jstojava.parser.comments.JsAttributed;
 import org.ebayopensource.dsf.jstojava.parser.comments.JsVariantType;
 import org.ebayopensource.dsf.jstojava.resolver.IThisScopeContext;
 import org.ebayopensource.dsf.jstojava.resolver.ITypeConstructContext;
+import org.ebayopensource.dsf.jstojava.resolver.OTypeResolverRegistry;
 import org.ebayopensource.dsf.jstojava.resolver.ThisObjScopeResolverRegistry;
 import org.ebayopensource.dsf.jstojava.resolver.ThisScopeContext;
 import org.ebayopensource.dsf.jstojava.resolver.TypeConstructContext;
@@ -111,8 +112,10 @@ class JstExpressionTypeLinker implements IJstVisitor {
 
 	private GroupInfo m_groupInfo = null;
 	private boolean m_typeConstructedDuringLink;
+	private final boolean m_hasObjectLiteralResolvers;
 
 	JstExpressionTypeLinker(JstExpressionBindingResolver resolver) {
+		m_hasObjectLiteralResolvers = OTypeResolverRegistry.getInstance().hasResolvers();
 		m_resolver = resolver;
 		m_provider = new JstExpressionTypeLinkerHelper.GlobalNativeTypeInfoProvider() {
 			@Override
@@ -269,6 +272,8 @@ class JstExpressionTypeLinker implements IJstVisitor {
 			visitForInStmt((ForInStmt) node);
 		} else if (node instanceof JstBlock) {
 			visitJstBlock((JstBlock) node);
+		} else if(node instanceof ObjLiteral){
+			visitObjLiteral((ObjLiteral)node);
 		} else if (node instanceof NV) {
 			visitNV((NV) node);
 		} else if (node instanceof SimpleLiteral) {
@@ -278,6 +283,30 @@ class JstExpressionTypeLinker implements IJstVisitor {
 		}
 
 		return true;
+	}
+
+	private void visitObjLiteral(ObjLiteral node) {
+
+		// are there any otype field resolvers?
+		// only check one time for speed in 
+		if(!m_hasObjectLiteralResolvers){
+			return;
+		}
+		// bind object literal since there are resolvers
+		// we can be faster here... 
+		// get list of type keys from registered resolvers
+		// then do the following if object literal contains literal name
+		
+	
+		
+		if(node.getResultType() instanceof SynthOlType){
+			JstExpressionTypeLinkerHelper.doObjLiteralAndOTypeBindings(node,
+					(SynthOlType)node.getResultType(), null, this);	
+		}
+		
+		
+	
+	
 	}
 
 	private void visitJstMethod(final JstMethod method) {
@@ -399,7 +428,9 @@ class JstExpressionTypeLinker implements IJstVisitor {
 			JstExpressionTypeLinkerHelper.doExprTypeUpdate(m_resolver, this,
 					identifier, resolvedType, m_groupInfo);
 		}
+		
 
+		// TODO do we need to do this now? possible revisit
 		if (type instanceof JstObjectLiteralType) {// otype, infer rhs
 			if (node.getValue() != null
 					&& node.getValue() instanceof ObjLiteral) {
@@ -1868,6 +1899,7 @@ class JstExpressionTypeLinker implements IJstVisitor {
 							rhsType, pos, scopes);
 
 				}
+				// TODO possible revisit here need to remove and test
 				if(rhsResolveNeeded && rhsExpr instanceof ObjLiteral){
 					IJstType rhsType = rhsExpr.getResultType();
 					if (rhsType == null) {
