@@ -2392,6 +2392,11 @@ public class JstExpressionTypeLinkerHelper {
 		
 		IJstType override = resolveOtype(objLiteral);
 		
+		if(otype instanceof JstAttributedType){
+				JstAttributedType atype = (JstAttributedType)otype;
+				otype = atype.getOType(atype.getAttributeName());
+		}
+		
 		if(otype==null && override!=null){
 			otype = override;
 		}
@@ -2403,7 +2408,7 @@ public class JstExpressionTypeLinkerHelper {
 		else if (synthOlType !=null && otype != null && (otype instanceof JstObjectLiteralType)) {
 			synthOlType.addResolvedOType(otype);
 		}else{
-    		// do nothing?
+    		return;
 		}
 		
 		// now we traverse the object literal to look 4 further bindings like:
