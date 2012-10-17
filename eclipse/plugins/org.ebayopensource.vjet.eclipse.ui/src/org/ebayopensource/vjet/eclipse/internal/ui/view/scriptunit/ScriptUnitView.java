@@ -16,8 +16,10 @@ import java.util.List;
 
 import org.ebayopensource.dsf.jst.IJstNode;
 import org.ebayopensource.dsf.jst.IJstType;
+import org.ebayopensource.dsf.jst.IScriptProblem;
 import org.ebayopensource.dsf.jst.IScriptUnit;
 import org.ebayopensource.dsf.jst.JstSource;
+import org.ebayopensource.dsf.jst.declaration.JstBlock;
 import org.ebayopensource.dsf.jst.declaration.JstMethod;
 import org.ebayopensource.dsf.jst.declaration.JstProperty;
 import org.ebayopensource.dsf.jst.declaration.JstType;
@@ -468,6 +470,45 @@ public class ScriptUnitView extends ViewPart implements ISelectionListener{
 		try {
 			String groupName = sourceModule.getGroupName();
 			String fileName = sourceModule.getTypeName().typeName();
+			System.out.println(groupName);
+			if(groupName.equals(".org.eclipse.dltk.mod.core.external.folders")){
+				final IJstType type = TypeSpaceMgr.getInstance().findType(sourceModule.getTypeName());
+				return new IScriptUnit() {
+					
+					@Override
+					public IJstType getType() {
+						// TODO Auto-generated method stub
+						return type;
+					}
+					
+					@Override
+					public JstBlock getSyntaxRoot() {
+						// TODO Auto-generated method stub
+						return null;
+					}
+					
+					@Override
+					public List<IScriptProblem> getProblems() {
+						// TODO Auto-generated method stub
+						return null;
+					}
+					
+					@Override
+					public IJstNode getNode(int startOffset) {
+						// TODO Auto-generated method stub
+						return null;
+					}
+					
+					@Override
+					public List<JstBlock> getJstBlockList() {
+						// TODO Auto-generated method stub
+						return null;
+					}
+				};
+			}
+			// if from lib don't parse it get type from typespace
+			
+			
 			String source = sourceModule.getSource();
 			VjoParserToJstAndIType m_parser = new VjoParserToJstAndIType();
 			if(VjetPlugin.TRACE_PARSER){

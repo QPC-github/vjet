@@ -76,7 +76,7 @@ class ScriptUnitTreeContentProvider implements ITreeContentProvider {
 //			children.add(scriptUnit.getSyntaxRoot());
 		
 		//jst block list
-		if (scriptUnit.getJstBlockList().size() > 0)
+		if (scriptUnit.getJstBlockList()!=null && scriptUnit.getJstBlockList().size() > 0)
 			children.addAll(scriptUnit.getJstBlockList());
 		
 //		//problem
