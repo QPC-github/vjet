@@ -301,11 +301,9 @@ class JstExpressionTypeLinker implements IJstVisitor {
 		
 		if(node.getResultType() instanceof SynthOlType){
 			JstExpressionTypeLinkerHelper.doObjLiteralAndOTypeBindings(node,
-					(SynthOlType)node.getResultType(), null, this);	
+					(SynthOlType)node.getResultType(), null, this, null);	
 		}
 		
-		
-	
 	
 	}
 
@@ -1907,7 +1905,7 @@ class JstExpressionTypeLinker implements IJstVisitor {
 								"Object"));
 					} 
 					JstExpressionTypeLinkerHelper.doObjLiteralAndOTypeBindings((ObjLiteral) rhsExpr,
-							(SynthOlType) rhsExpr.getResultType(), rhsType, this);
+							(SynthOlType) rhsExpr.getResultType(), rhsType, this, null);
 				}
 
 			}

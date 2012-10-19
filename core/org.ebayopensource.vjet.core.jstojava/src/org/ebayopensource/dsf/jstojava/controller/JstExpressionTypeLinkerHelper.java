@@ -613,7 +613,8 @@ public class JstExpressionTypeLinkerHelper {
 				bound = types.get(0);
 			}
 		}
-		bound = bound instanceof IJstType && !(bound instanceof IJstRefType) && !((IJstType)bound).isSingleton() ? JstTypeHelper
+		bound = bound instanceof IJstType && !(bound instanceof IJstRefType)
+				&& !((IJstType) bound).isSingleton() ? JstTypeHelper
 				.getJstTypeRefType((IJstType) bound) : bound;
 
 		return bound;
@@ -677,7 +678,8 @@ public class JstExpressionTypeLinkerHelper {
 	public static List<IJstType> collectBindingTypes(IJstNode bound) {
 		final List<IJstType> toBindTypes = new ArrayList<IJstType>(2);
 		if (bound instanceof IJstType) {
-			if (bound instanceof IJstRefType || ((IJstType)bound).isSingleton()) {
+			if (bound instanceof IJstRefType
+					|| ((IJstType) bound).isSingleton()) {
 				toBindTypes.add((IJstType) bound);
 			} else {
 				toBindTypes.add(JstTypeHelper
@@ -1033,12 +1035,11 @@ public class JstExpressionTypeLinkerHelper {
 					IJstType parameterCorrectType = parameterType;
 					if (parameterType instanceof JstMixedType
 							&& !((JstType) parameterType).getStatus().isValid()) {
-						final JstMixedType mixedOTypes = (JstMixedType)parameterType;
-						for(IJstType mixedType :mixedOTypes.getMixedTypes()){
-							
+						final JstMixedType mixedOTypes = (JstMixedType) parameterType;
+						for (IJstType mixedType : mixedOTypes.getMixedTypes()) {
+
 						}
-					}
-					else if (parameterType instanceof JstType
+					} else if (parameterType instanceof JstType
 							&& !((JstType) parameterType).getStatus().isValid()) {
 						final IJstType potentialOtypeMemberType = parameterType;
 						IJstOType resolvedOtype = getOtype(potentialOtypeMemberType
@@ -1173,17 +1174,20 @@ public class JstExpressionTypeLinkerHelper {
 	}
 
 	public static void fixPropertyTypeRef(
-			final JstExpressionBindingResolver resolver, IJstVisitor jstExpressionTypeLinker, JstProperty pty,
+			final JstExpressionBindingResolver resolver,
+			IJstVisitor jstExpressionTypeLinker, JstProperty pty,
 			GroupInfo groupInfo) {
 		final IJstType ptyType = pty.getType();
 		final IJstType correctType = getCorrectType(resolver, ptyType,
 				groupInfo);
-		if(pty.getValue()!=null && pty.getValue() instanceof IExpr){
-			doExprTypeResolve(resolver, jstExpressionTypeLinker, (IExpr)pty.getValue(), correctType);
-		}else if(pty.getInitializer()!=null){
-			doExprTypeResolve(resolver, jstExpressionTypeLinker, pty.getInitializer(), correctType);
+		if (pty.getValue() != null && pty.getValue() instanceof IExpr) {
+			doExprTypeResolve(resolver, jstExpressionTypeLinker,
+					(IExpr) pty.getValue(), correctType);
+		} else if (pty.getInitializer() != null) {
+			doExprTypeResolve(resolver, jstExpressionTypeLinker,
+					pty.getInitializer(), correctType);
 		}
-		
+
 		if (correctType != ptyType) {
 			pty.setType(correctType);
 		}
@@ -2053,7 +2057,7 @@ public class JstExpressionTypeLinkerHelper {
 
 					extMtd = bindArgumentMappng(revisitor, grpInfo,
 							matchingMtd, mtdExpr.getArgs().get(0));
-					if(extMtd!=null){
+					if (extMtd != null) {
 						parameters = extMtd.getArgs();
 					}
 
@@ -2094,7 +2098,7 @@ public class JstExpressionTypeLinkerHelper {
 				+ callingMethod.getName().getName();
 		FunctionParamsMetaRegistry fmr = FunctionParamsMetaRegistry
 				.getInstance();
-	
+
 		if (fmr.isFuncMetaMappingSupported(targetFunc)) {
 			String key = keyArg.toExprText();
 			key = unquote(key);
@@ -2102,8 +2106,7 @@ public class JstExpressionTypeLinkerHelper {
 					groupInfo.getGroupName(), groupInfo.getDependentGroups());
 			if (metaExt != null) {
 				IJstMethod extFunc = metaExt.getMethod();
-				JstExpressionTypeLinkerTraversal.accept(
-						extFunc, revisitor);
+				JstExpressionTypeLinkerTraversal.accept(extFunc, revisitor);
 				IJstMethod resolved = unwrapMethod(extFunc);
 				return resolved;
 			}
@@ -2245,7 +2248,6 @@ public class JstExpressionTypeLinkerHelper {
 		}
 	}
 
-	
 	public static void doExprTypeResolve(
 			final JstExpressionBindingResolver resolver,
 			final IJstVisitor revisitor, final IExpr expr, final IJstType type) {
@@ -2262,13 +2264,13 @@ public class JstExpressionTypeLinkerHelper {
 			} else if (expr instanceof ObjLiteral
 					&& exprType instanceof SynthOlType
 					&& type instanceof JstMixedType) {
-				
+
 				doObjLiteralAndOTypeBindingsMixedTypes((ObjLiteral) expr,
-						(SynthOlType) exprType, (JstMixedType)type, revisitor);
-			}else if (expr instanceof ObjLiteral
+						(SynthOlType) exprType, (JstMixedType) type, revisitor);
+			} else if (expr instanceof ObjLiteral
 					&& exprType instanceof SynthOlType) {
 				doObjLiteralAndOTypeBindings((ObjLiteral) expr,
-						(SynthOlType) exprType, type, revisitor);
+						(SynthOlType) exprType, type, revisitor, null);
 			} else if (expr instanceof FuncExpr
 					&& exprType instanceof JstFuncType) {
 				if (type instanceof JstFuncType) {
@@ -2328,10 +2330,11 @@ public class JstExpressionTypeLinkerHelper {
 
 	public static void doExprTypeResolve(
 			final JstExpressionBindingResolver resolver,
-			final IJstVisitor revisitor, final IExpr expr, final List<IJstType> types) {
+			final IJstVisitor revisitor, final IExpr expr,
+			final List<IJstType> types) {
 		for (IJstType iJstType : types) {
-			
-			doExprTypeResolve( resolver,revisitor, expr, iJstType);
+
+			doExprTypeResolve(resolver, revisitor, expr, iJstType);
 		}
 	}
 
@@ -2374,96 +2377,122 @@ public class JstExpressionTypeLinkerHelper {
 	private static void doObjLiteralAndOTypeBindingsMixedTypes(
 			final ObjLiteral objLiteral, final SynthOlType synthOlType,
 			final JstMixedType mtype, final IJstVisitor revisitor) {
-		for(IJstType type : mtype.getMixedTypes()){
-			if(type instanceof JstAttributedType){
-				JstAttributedType atype = (JstAttributedType)type;
+		for (IJstType type : mtype.getMixedTypes()) {
+			if (type instanceof JstAttributedType) {
+				JstAttributedType atype = (JstAttributedType) type;
 				IJstOType otype = atype.getOType(atype.getAttributeName());
-				doObjLiteralAndOTypeBindings(objLiteral, synthOlType, otype, revisitor);
-			}else if(type instanceof JstObjectLiteralType){
-				doObjLiteralAndOTypeBindings(objLiteral, synthOlType, (IJstOType)type, revisitor);
+				doObjLiteralAndOTypeBindings(objLiteral, synthOlType, otype,
+						revisitor, mtype);
+			} else if (type instanceof JstObjectLiteralType) {
+				doObjLiteralAndOTypeBindings(objLiteral, synthOlType,
+						(IJstOType) type, revisitor, null);
 			}
 		}
 	}
-	
-	static void doObjLiteralAndOTypeBindings(
-			 ObjLiteral objLiteral, final SynthOlType synthOlType,
-			 IJstType otype, final IJstVisitor revisitor) {
-		
-		
+
+	static void doObjLiteralAndOTypeBindings(ObjLiteral objLiteral,
+			final SynthOlType synthOlType, IJstType otype,
+			final IJstVisitor revisitor, JstMixedType mtype) {
+
 		IJstType override = resolveOtype(objLiteral);
-		
-		if(otype instanceof JstAttributedType){
-				JstAttributedType atype = (JstAttributedType)otype;
-				otype = atype.getOType(atype.getAttributeName());
+
+		if (otype instanceof JstAttributedType) {
+			JstAttributedType atype = (JstAttributedType) otype;
+			otype = atype.getOType(atype.getAttributeName());
 		}
-		
-		if(otype==null && override!=null){
+
+		if (override != null) {
 			otype = override;
 		}
-		
+
 		// support nested obj literals
-		if(otype != null && (otype instanceof SynthOlType) ){
-			objLiteral.setJstType(otype);	
-		}
-		else if (synthOlType !=null && otype != null && (otype instanceof JstObjectLiteralType)) {
+		if (otype != null && (otype instanceof SynthOlType)) {
+			objLiteral.setJstType(otype);
+		} else if (synthOlType != null && otype != null
+				&& (otype instanceof JstObjectLiteralType)) {
 			synthOlType.addResolvedOType(otype);
-		}else{
-    		return;
+		} else if (synthOlType != null && otype != null
+				&& (otype instanceof JstMixedType)) {
+			JstMixedType mixed = (JstMixedType) otype;
+			for (final IJstType type : mixed.getMixedTypes()) {
+				IJstType mixedOType = null;
+				if (type instanceof JstAttributedType) {
+					JstAttributedType atype = (JstAttributedType) type;
+					mixedOType = atype.getOType(atype.getAttributeName());
+				}
+
+				if (synthOlType != null && mixedOType != null
+						&& (mixedOType instanceof JstObjectLiteralType)) {
+					synthOlType.addResolvedOType(mixedOType);
+				}
+			}
+		} else {
+			return;
 		}
-		
+
 		// now we traverse the object literal to look 4 further bindings like:
 		// functions, embedded obj literals etc.
 		for (NV nv : objLiteral.getNVs()) {
 			final JstIdentifier id = nv.getIdentifier();
 			final String name = id.getName();
-			if(otype!=null){
-				doObjLiteralNameBinding(otype, id, name);
-	
+			if (otype != null) {
+				doObjLiteralNameBinding(otype, id, name,mtype);
+
 				final IExpr valueExpr = nv.getValue();
 				if (valueExpr != null) {
-					doObjLiteralValueBinding(otype, revisitor, name, valueExpr);
+					doObjLiteralValueBinding(otype, revisitor, name, valueExpr,
+							mtype);
 				}
 			}
 		}
 	}
 
 	private static IJstType resolveOtype(ObjLiteral objLiteral) {
-		
-		
-		 IJstType otype = null;
-		OTypeResolverRegistry otypeResolver = OTypeResolverRegistry.getInstance();
-		
-		if(objLiteral.getNVs().size()>0){
+
+		IJstType otype = null;
+		OTypeResolverRegistry otypeResolver = OTypeResolverRegistry
+				.getInstance();
+
+		if (objLiteral.getNVs().size() > 0) {
 			Set<String> keys = OTypeResolverRegistry.getInstance().getKeys();
 			for (String field : keys) {
-				NV firstPosition =objLiteral.getNV(field);
-				if(firstPosition==null){
+				NV firstPosition = objLiteral.getNV(field);
+				if (firstPosition == null) {
 					return null;
 				}
 				String key = firstPosition.getName();
-				if(otypeResolver.hasResolver(key)){
-					
+				if (otypeResolver.hasResolver(key)) {
+
 					otype = otypeResolver.resolve(key, firstPosition);
-					if(otype instanceof JstAttributedType){
-						JstAttributedType atype =(JstAttributedType)otype;
-						final String attributeName = atype.getAttributeName();
-						if (atype.isOType()) {
-							final IJstType objLiteralOrFunctionRefType = atype
-									.getOType(attributeName);
-							if (objLiteralOrFunctionRefType != null) {
-								otype = objLiteralOrFunctionRefType;
-							}
-						} 
+					if (otype instanceof JstAttributedType) {
+						JstAttributedType atype = (JstAttributedType) otype;
+						otype = convertAttributedTypeToOtype(atype);
 					}
 				}
 			}
-			
+
 		}
 		return otype;
 	}
 
+	private static IJstType convertAttributedTypeToOtype(
+			JstAttributedType atype) {
+		final String attributeName = atype.getAttributeName();
+		if (atype.isOType()) {
+			final IJstType objLiteralOrFunctionRefType = atype
+					.getOType(attributeName);
+			if (objLiteralOrFunctionRefType != null) {
+				return objLiteralOrFunctionRefType;
+			}
+		}
+		return null;
+	}
+
 	private static void doObjLiteralNameBinding(final IJstType otype,
-			final JstIdentifier id, final String name) {
+			final JstIdentifier id, final String name,JstMixedType mtype) {
+		
+		// TODO we need a multiple node binding here since multiple 
+		
 		IJstNode oBinding = otype.getProperty(name, false);
 		if (oBinding != null) {
 			id.setJstBinding(oBinding);
@@ -2472,25 +2501,27 @@ public class JstExpressionTypeLinkerHelper {
 			if (oBinding != null) {
 				id.setJstBinding(oBinding);
 			}
+			
+			
 		}
 	}
 
 	private static void doObjLiteralValueBinding(final IJstType otype,
 			final IJstVisitor revisitor, final String name,
-			final IExpr valueExpr) {
-		if(valueExpr instanceof JstArrayInitializer){
-			JstArrayInitializer arrayValueExpr = (JstArrayInitializer)valueExpr;
-			for(IExpr element: arrayValueExpr.getExprs()){
-				if(element instanceof ObjLiteral){
+			final IExpr valueExpr, JstMixedType mtype) {
+		if (valueExpr instanceof JstArrayInitializer) {
+			JstArrayInitializer arrayValueExpr = (JstArrayInitializer) valueExpr;
+			for (IExpr element : arrayValueExpr.getExprs()) {
+				if (element instanceof ObjLiteral) {
 					doObjLiteralAndOTypeBindings((ObjLiteral) element,
 							(SynthOlType) element.getResultType(), otype,
-							revisitor);
+							revisitor, mtype);
 				}
-				
+
 			}
-		
+
 		}
-		
+
 		if (valueExpr instanceof FuncExpr
 				&& isAnonymousFunction(((FuncExpr) valueExpr).getFunc())) {
 			final IJstProperty matchingOTypePty = otype.getProperty(name,
@@ -2498,38 +2529,71 @@ public class JstExpressionTypeLinkerHelper {
 			final JstMethod func = ((FuncExpr) valueExpr).getFunc();
 			if (matchingOTypePty != null && func != null
 					&& matchingOTypePty.getType() != null) {
-				
-				if(matchingOTypePty.getType() instanceof JstFunctionRefType){
+
+				if (matchingOTypePty.getType() instanceof JstFunctionRefType) {
 					deriveAnonymousFunction(
 							((JstFunctionRefType) matchingOTypePty.getType())
 									.getMethodRef(),
 							func, matchingOTypePty.getDoc());
-					JstExpressionTypeLinkerTraversal.accept(valueExpr, revisitor);
-				}else if(matchingOTypePty.getType() instanceof JstFuncType){
+					JstExpressionTypeLinkerTraversal.accept(valueExpr,
+							revisitor);
+				} else if (matchingOTypePty.getType() instanceof JstFuncType) {
 					deriveAnonymousFunction(
 							((JstFuncType) matchingOTypePty.getType())
 									.getFunction(),
 							func, matchingOTypePty.getDoc());
-					JstExpressionTypeLinkerTraversal.accept(valueExpr, revisitor);
+					JstExpressionTypeLinkerTraversal.accept(valueExpr,
+							revisitor);
 				}
-				
+
 			}
 		} else if (valueExpr instanceof ObjLiteral
 				&& valueExpr.getResultType() != null
 				&& valueExpr.getResultType() instanceof SynthOlType) {
-			final IJstProperty matchingProperty = otype.getProperty(name,
-					false, true);
-			if (matchingProperty != null) {
-				final IJstType propertyType = matchingProperty.getType();
+			// TODO this needs to support mixed type only one otype is checked
+			// for first type found
+			IJstType propertyType = null;
+			IJstProperty prop = otype.getProperty(name, false, true);
+			if (prop != null && mtype == null) {
+				propertyType = otype.getProperty(name, false, true).getType();
+			}
+			if (mtype != null) {
+				propertyType = findLiteralFieldTypeFromMixedType(mtype, name);
+			}
+			if (propertyType != null) {
 				doObjLiteralAndOTypeBindings((ObjLiteral) valueExpr,
 						(SynthOlType) valueExpr.getResultType(), propertyType,
-						revisitor);
-			}else{
+						revisitor, null);
+			} else {
 				doObjLiteralAndOTypeBindings((ObjLiteral) valueExpr,
 						(SynthOlType) valueExpr.getResultType(), otype,
-						revisitor);
+						revisitor, null);
 			}
 		}
+	}
+
+	private static IJstType findLiteralFieldTypeFromMixedType(
+			JstMixedType mtype, String name) {
+		List<IJstType> types = new ArrayList<IJstType>();
+		for (IJstType type : mtype.getMixedTypes()) {
+			if(type instanceof JstAttributedType){
+				IJstType otype = convertAttributedTypeToOtype((JstAttributedType)type);
+				if(otype!=null){
+					IJstProperty prop = otype.getProperty(name, false, true);
+					if(prop!=null){
+						if(prop.getType() instanceof JstMixedType){
+							types.addAll(((JstMixedType)prop.getType()).getMixedTypes());
+						}else{
+							types.add(prop.getType());
+						}
+					}
+				}
+			}
+		}
+		if(!types.isEmpty()){
+			return new JstMixedType(types);
+		}
+		return null;
 	}
 
 	public static boolean isFunctionMetaAvailable(final FuncExpr funcExpr) {
@@ -2923,7 +2987,8 @@ public class JstExpressionTypeLinkerHelper {
 	}
 
 	private static void deriveAnonymousFunction(
-			final JstFuncType functionDefType, final JstMethod anonymousFunction, IJstDoc doc) {
+			final JstFuncType functionDefType,
+			final JstMethod anonymousFunction, IJstDoc doc) {
 		final IJstMethod paramFunction = functionDefType.getFunction();
 		deriveAnonymousFunction(paramFunction, anonymousFunction, doc);
 	}
@@ -2944,8 +3009,9 @@ public class JstExpressionTypeLinkerHelper {
 		// deal with return type inference and argument type inferences
 		final IJstType paramFunctionRtnType = paramFunction.getRtnType();
 		anonymousFunction.setRtnType(paramFunctionRtnType);
-		anonymousFunction.setReturnOptional(paramFunction.isReturnTypeOptional());
-		((JstMethod)paramFunction).setDoc(doc);
+		anonymousFunction.setReturnOptional(paramFunction
+				.isReturnTypeOptional());
+		((JstMethod) paramFunction).setDoc(doc);
 		if (!paramFunction.isDispatcher()) {
 			final List<JstArg> params = paramFunction.getArgs();
 			final List<JstArg> inferParams = anonymousFunction.getArgs();
@@ -3428,10 +3494,10 @@ public class JstExpressionTypeLinkerHelper {
 		JstTypeSpaceMgr tsMgr = resolver.getController().getJstTypeSpaceMgr();
 		ITypeSpace<IJstType, IJstNode> ts = tsMgr.getTypeSpace();
 
-		if(groupInfo == null){
+		if (groupInfo == null) {
 			return null;
 		}
-		
+
 		List<IJstType> typeList = ts.getVisibleType(fullName,
 				ts.getGroup(groupInfo.getGroupName()));
 

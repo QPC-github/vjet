@@ -71,6 +71,11 @@ public class OTypeResolverRegistry {
 			IOTypeResolver resolver = resolverList.get(i);
 			String typeName = resolver.resolve(args);
 			
+			if(typeName==null){
+				return null;
+			}
+			
+			
 			if(typeName.contains("org.mozilla.mod.javascript.Undefined")){
 				return null;
 			}
@@ -114,6 +119,7 @@ public class OTypeResolverRegistry {
 				
 			} catch (ParseException e) {
 				// do nothing will validate later
+				e.printStackTrace();
 				
 			} catch(TokenMgrError e){
 				// do nothing will validate later
