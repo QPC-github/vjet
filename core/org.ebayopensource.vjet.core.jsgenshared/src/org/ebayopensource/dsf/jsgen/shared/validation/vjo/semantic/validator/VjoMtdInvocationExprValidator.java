@@ -48,11 +48,13 @@ import org.ebayopensource.dsf.jst.declaration.JstConstructor;
 import org.ebayopensource.dsf.jst.declaration.JstFuncType;
 import org.ebayopensource.dsf.jst.declaration.JstFunctionRefType;
 import org.ebayopensource.dsf.jst.declaration.JstMethod;
+import org.ebayopensource.dsf.jst.declaration.JstMixedType;
 import org.ebayopensource.dsf.jst.declaration.JstObjectLiteralType;
 import org.ebayopensource.dsf.jst.declaration.JstParamType;
 import org.ebayopensource.dsf.jst.declaration.JstProxyType;
 import org.ebayopensource.dsf.jst.declaration.JstTypeRefType;
 import org.ebayopensource.dsf.jst.declaration.JstTypeWithArgs;
+import org.ebayopensource.dsf.jst.declaration.JstVariantType;
 import org.ebayopensource.dsf.jst.declaration.JstVars;
 import org.ebayopensource.dsf.jst.expr.FieldAccessExpr;
 import org.ebayopensource.dsf.jst.expr.FuncExpr;
@@ -215,8 +217,10 @@ public class VjoMtdInvocationExprValidator
 							"ObjLiteral".equals(qualifierType.getSimpleName()))){
 							return; //OK ???
 						}
-						
-						if(!ctx.getMissingImportTypes().contains(qualifierType)){
+						// TODO support mixed and variant type method / property checking 
+						// make sure to make dynamic types not give error
+						if(!ctx.getMissingImportTypes().contains(qualifierType) && !(qualifierType instanceof JstVariantType)
+								 && !(qualifierType instanceof JstMixedType)){
 							//METHOD_SHOULD_BE_DEFINED
 							satisfyRule(ctx, ruleRepo.METHOD_SHOULD_BE_DEFINED,
 								new BaseVjoSemanticRuleCtx
