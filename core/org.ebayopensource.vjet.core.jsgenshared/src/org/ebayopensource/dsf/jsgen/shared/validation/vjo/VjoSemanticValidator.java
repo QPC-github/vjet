@@ -183,6 +183,24 @@ public abstract class VjoSemanticValidator implements
 				return depType;
 			}
 		}
+		// check secondary types
+		
+		List<? extends IJstType> secondaryTypes =  targetType.getSecondaryTypes();
+		if (secondaryTypes != null && !secondaryTypes.isEmpty()) {
+			String typeName = unknownTypeName;
+			boolean isAttributed = false;
+			if(unknownType instanceof JstAttributedType){
+				isAttributed = true;
+				JstAttributedType atype = (JstAttributedType)unknownType;
+				typeName = atype.getAttributorType().getName();
+			}
+			
+			for (IJstType secondaryType : secondaryTypes) {
+
+				if (secondaryType.getName().equals(typeName))
+					return secondaryType;
+			}
+		}
 		
 		// check param types
 		List<JstParamType> paramTypeList = targetType.getParamTypes();
