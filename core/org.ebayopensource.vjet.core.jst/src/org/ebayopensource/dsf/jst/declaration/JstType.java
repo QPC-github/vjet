@@ -3144,10 +3144,10 @@ public class JstType extends BaseJstNode implements IJstType {
 				m_secondaryTypes = new ArrayList<IJstType>(1);
 			}
 			m_secondaryTypes.add(secondaryType);
-			addChild(secondaryType);
+		//	addChild(secondaryType);
 		}
-		secondaryType.m_outerType = this;
-		secondaryType.setParent(this);
+	//	secondaryType.m_outerType = this;
+	//	secondaryType.setParent(this);
 	}
 	
 	@Override
