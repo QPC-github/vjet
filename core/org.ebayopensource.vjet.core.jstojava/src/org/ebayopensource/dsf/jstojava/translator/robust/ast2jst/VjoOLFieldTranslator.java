@@ -326,7 +326,7 @@ public class VjoOLFieldTranslator extends
 		//TODO - We need revisit about setting to non-FINAL
 		JstSynthesizedProperty property = 
 			new JstSynthesizedProperty(getTypeRef(innerType), innerType.getSimpleName(),
-					null, mod);
+					(JstIdentifier)null, mod);
 		property.setParent(currentType);
 		// check if this inner type synthesized property already exists
 		if (currentType.getProperty(property.getName().getName()) != null) {
