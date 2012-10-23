@@ -1014,7 +1014,7 @@ public class VjoJstTypeValidator
 							final BaseVjoSemanticRuleCtx ruleCtx = new BaseVjoSemanticRuleCtx(jstType, ctx.getGroupId(), new String[]{toExtMethod.getName().getName()});
 							satisfyRule(ctx, VjoSemanticRuleRepo.getInstance().ABSTRACT_METHOD_MUST_BE_IMPLEMENTED, ruleCtx);
 						}
-						else{
+						else if(!(candidateMtd instanceof ISynthesized)){
 							//incompatible methods structure
 							final BaseVjoSemanticRuleCtx ruleCtx = new BaseVjoSemanticRuleCtx(implMethodFound.getName(), ctx.getGroupId(), new String[]{toExtMethod.getName().getName()});
 							satisfyRule(ctx, VjoSemanticRuleRepo.getInstance().OVERRIDE_METHOD_SHOULD_HAVE_COMPATIBLE_SIGNATURE, ruleCtx);
