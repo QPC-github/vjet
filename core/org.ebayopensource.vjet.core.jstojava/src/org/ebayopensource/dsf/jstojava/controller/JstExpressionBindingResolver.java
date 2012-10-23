@@ -9,7 +9,6 @@
 package org.ebayopensource.dsf.jstojava.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.ebayopensource.dsf.jsgen.shared.jstvalidator.DefaultJstProblem;
 import org.ebayopensource.dsf.jst.IJstGlobalFunc;
@@ -30,6 +29,7 @@ import org.ebayopensource.dsf.jst.declaration.JstFuncType;
 import org.ebayopensource.dsf.jst.declaration.JstGlobalProp;
 import org.ebayopensource.dsf.jst.declaration.JstSynthesizedProperty;
 import org.ebayopensource.dsf.jst.declaration.JstType;
+import org.ebayopensource.dsf.jst.term.JstIdentifier;
 import org.ebayopensource.dsf.jst.ts.JstTypeSpaceMgr;
 import org.ebayopensource.dsf.jstojava.report.DefaultErrorReporter;
 import org.ebayopensource.dsf.jstojava.report.ErrorReporter;
@@ -109,7 +109,7 @@ public class JstExpressionBindingResolver implements IJstRefResolver {
 										}
 										else if(globalBinding instanceof IJstMethod){
 											((JstGlobalProp)globalPty)
-												.setProperty(new JstSynthesizedProperty(new JstFuncType((IJstMethod)globalBinding), globalPty.getName().getName(), null, null));
+												.setProperty(new JstSynthesizedProperty(new JstFuncType((IJstMethod)globalBinding), globalPty.getName().getName(), (JstIdentifier)null, null));
 										}
 									}
 								}

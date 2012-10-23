@@ -152,7 +152,7 @@ public class JstProperty extends BaseJstNode implements IJstProperty {
 	 * @param initializer IExpr
 	 * @param modifiers JstModifiers
 	 */
-	private JstProperty(final IJstType type, 
+	protected JstProperty(final IJstType type, 
 			final JstName name, 			
 			final JstModifiers modifiers,
 			final ISimpleTerm value, 

@@ -21,6 +21,7 @@ import org.ebayopensource.dsf.jst.declaration.JstVjoBaseProperty;
 import org.ebayopensource.dsf.jst.declaration.JstVjoProperty;
 import org.ebayopensource.dsf.jst.meta.IJsCommentMeta;
 import org.ebayopensource.dsf.jst.meta.JsType;
+import org.ebayopensource.dsf.jst.term.JstIdentifier;
 import org.ebayopensource.dsf.jstojava.translator.JsDocHelper;
 import org.ebayopensource.dsf.jstojava.translator.TranslateCtx;
 import org.ebayopensource.dsf.jstojava.translator.TranslateHelper;
@@ -235,7 +236,7 @@ public class TypeRobustTranslator extends CompletionsFilteredRobustTranslator
 		} else {
 			JstSynthesizedProperty clazzProp = 
 				new JstSynthesizedProperty( 
-					JstCache.getInstance().getType("vjo.Class"), VjoKeywords.CLASS, null, null);
+					JstCache.getInstance().getType("vjo.Class"), VjoKeywords.CLASS, (JstIdentifier)null, null);
 			clazzProp.getModifiers().setPublic().setFinal().setStatic(true);
 			clazzProp.setParent(currentType);
 			currentType.addProperty(clazzProp);
