@@ -36,6 +36,7 @@ import org.ebayopensource.dsf.ts.event.group.AddGroupEvent;
 import org.ebayopensource.vjet.eclipse.codeassist.CodeassistUtils;
 import org.ebayopensource.vjet.eclipse.core.VjetPlugin;
 import org.ebayopensource.vjo.tool.typespace.TypeSpaceMgr;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.dltk.mod.core.DLTKCore;
 
 public class VjoJstTypeLoader implements IJstTypeLoader {
@@ -98,12 +99,12 @@ public class VjoJstTypeLoader implements IJstTypeLoader {
 			
 			if (srcPathList == null || srcPathList.size() == 0) {
 				typeList.addAll(loadJstTypesFromGroup(groupName,
-						actualGroupFolderName, groupFolderOrFile));
+						actualGroupFolderName, groupFolderOrFile,group.getSrcPathInclusionPatterns(), group.getSrcPathExclusionPatterns()));
 			} else {
 				for (String srcPath : srcPathList) {
 					File srcFolder = getGroupSrcFolder(groupPath, srcPath);
 					typeList.addAll(loadJstTypesFromGroup(groupName,
-							actualGroupFolderName, srcFolder));
+							actualGroupFolderName, srcFolder, group.getSrcPathInclusionPatterns(), group.getSrcPathExclusionPatterns()));
 				}
 			}
 		}
@@ -153,7 +154,7 @@ public class VjoJstTypeLoader implements IJstTypeLoader {
 	}
 
 	private List<SourceType> loadJstTypesFromGroup(String groupName,
-			String actualGroupFolderName, File groupFolderOrFile) {
+			String actualGroupFolderName, File groupFolderOrFile, List<String> inclusionPatterns, List<String> exclusionPatterns) {
 
 		ArrayList<SourceType> srcTypeList = new ArrayList<SourceType>();
 
@@ -161,7 +162,7 @@ public class VjoJstTypeLoader implements IJstTypeLoader {
 
 			if (groupFolderOrFile.isDirectory()) {
 				return loadJstTypesFromProject(groupName,
-						actualGroupFolderName, groupFolderOrFile);
+						actualGroupFolderName, groupFolderOrFile, inclusionPatterns,exclusionPatterns);
 			} else if (!TypeSpaceMgr.getInstance().existGroup(groupName)) {
 				return loadJstTypesFromLibrary(groupName, groupFolderOrFile);
 			}
@@ -192,7 +193,7 @@ public class VjoJstTypeLoader implements IJstTypeLoader {
 	}
 
 	protected List<SourceType> loadJstTypesFromProject(String groupName,
-			String actualGroupFolderName, File srcFolder) {
+			String actualGroupFolderName, File srcFolder, List<String> inclusionPatterns, List<String> exclusionPatterns) {
 
 		JstSrcFileCollector fileColl = new JstSrcFileCollector();
 		ArrayList<SourceType> srcTypeList = new ArrayList<SourceType>();
@@ -204,7 +205,7 @@ public class VjoJstTypeLoader implements IJstTypeLoader {
 			for (File file : list) {
 
 				try {
-					if (isVjoFile(file)) {
+					if (isVjoFile(file) && !isExcluded(srcFolder, file,inclusionPatterns,exclusionPatterns)) {
 						srcTypeList.add(createType(groupName,
 								actualGroupFolderName, srcFolder.getPath(),
 								file));
@@ -220,6 +221,44 @@ public class VjoJstTypeLoader implements IJstTypeLoader {
 
 		return srcTypeList;
 
+	}
+
+	private boolean isExcluded(File srcFolder, File file, List<String> inclusionPatterns,
+			List<String> exclusionPatterns) {
+		if( inclusionPatterns.size()==0 || exclusionPatterns.size()==0){
+			return true;
+		}
+		
+		char[][] inclusionPatternsChar = new char[][]{};
+	
+			inclusionPatternsChar = processPatterns(srcFolder,
+					inclusionPatterns);
+		
+		char[][] exclusionPatternsChar = new char[][]{};
+			exclusionPatternsChar = processPatterns(srcFolder,
+					exclusionPatterns);
+			
+		
+		
+		boolean excluded = org.eclipse.dltk.mod.compiler.util.Util.isExcluded(file.toString().toCharArray(), inclusionPatternsChar,
+				exclusionPatternsChar, file.isDirectory());
+		if(excluded){
+			System.out.println("file excluded :" + file);
+		}
+		return excluded;
+		
+	
+	}
+
+	private char[][] processPatterns(File srcFolder,
+			List<String> patterns) {
+		char[][] patternsChar;
+		int length = patterns.size();
+		patternsChar = new char[length][];
+		for (int i = 0; i < length; i++) {
+			patternsChar[i] = new File(srcFolder,patterns.get(i)).getAbsolutePath().toString().toCharArray();
+		}
+		return patternsChar;
 	}
 
 	private boolean isVjoFile(File file) {

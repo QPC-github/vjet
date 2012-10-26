@@ -164,6 +164,7 @@ public class JstTypeSpaceLoader implements ITypeSpaceLoader {
 				}				
 				else if (type == null && srcType.getSource() != null) {	
 					isSerialized = false;
+					// TODO show better progress message here not percentage
 					type = controller.parse(srcType.getGroupName(), srcType.getFileName(), srcType.getSource()).getType();
 				}
 				

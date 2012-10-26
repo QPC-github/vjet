@@ -39,10 +39,10 @@ public class TypeSpaceGroupLoadJob extends WorkspaceJob {
 	@Override
 	public IStatus runInWorkspace(IProgressMonitor monitor)
 			throws CoreException {
-		TypeSpaceMgr mgr = TypeSpaceMgr.getInstance();
+//		TypeSpaceMgr mgr = TypeSpaceMgr.getInstance();
 		// log list of groups being processed
-		TypeSpaceTracer.logLoadEvent(m_list);
-		mgr.load(new EclipseTypeLoadMonitor(monitor), m_list, null);
+//		TypeSpaceTracer.logLoadEvent(m_list);
+//		mgr.load(new EclipseTypeLoadMonitor(monitor), m_list, null);
 		return Status.OK_STATUS;
 	}
 

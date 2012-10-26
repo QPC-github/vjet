@@ -26,7 +26,7 @@ public class TypeSpaceTracer {
 				.getDebugOption("org.ebayopensource.vjet.eclipse.core/typespace"));
 
 	
-	protected static void logLoadEvent(List<GroupInfo> groups) {
+	public static void logLoadEvent(List<GroupInfo> groups) {
 		
 		if(!DEBUG_TS){
 			return;

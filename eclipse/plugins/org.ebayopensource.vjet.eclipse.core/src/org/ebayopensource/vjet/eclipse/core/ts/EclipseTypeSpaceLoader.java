@@ -29,6 +29,7 @@ import org.ebayopensource.vjet.eclipse.core.VjoNature;
 import org.ebayopensource.vjet.eclipse.core.builder.TypeSpaceBuilder;
 import org.ebayopensource.vjo.tool.typespace.GroupInfo;
 import org.ebayopensource.vjo.tool.typespace.ITypeSpaceLoader;
+import org.ebayopensource.vjo.tool.typespace.SourcePathInfo;
 import org.ebayopensource.vjo.tool.typespace.SourceTypeName;
 import org.ebayopensource.vjo.tool.typespace.TypeSpaceMgr;
 import org.eclipse.core.internal.resources.ResourceException;
@@ -36,11 +37,9 @@ import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -72,8 +71,7 @@ import org.eclipse.dltk.mod.internal.core.ScriptProject;
  * 
  * 
  */
-public class EclipseTypeSpaceLoader implements ITypeSpaceLoader,
-		IResourceChangeListener {
+public class EclipseTypeSpaceLoader implements ITypeSpaceLoader {
 
 	private List<SourceTypeName> m_types = new ArrayList<SourceTypeName>();
 
@@ -99,12 +97,12 @@ public class EclipseTypeSpaceLoader implements ITypeSpaceLoader,
 	 */
 	public EclipseTypeSpaceLoader() {
 		super();
-		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		workspace.removeResourceChangeListener(this);
-		workspace.addResourceChangeListener(this,
-				IResourceChangeEvent.POST_CHANGE
-						| IResourceChangeEvent.PRE_DELETE
-						| IResourceChangeEvent.PRE_CLOSE);
+//		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+//		workspace.removeResourceChangeListener(this);
+//		workspace.addResourceChangeListener(this,
+//				IResourceChangeEvent.POST_CHANGE
+//						| IResourceChangeEvent.PRE_DELETE
+//						| IResourceChangeEvent.PRE_CLOSE);
 	}
 
 	public List<SourceTypeName> getTypes() {
@@ -523,41 +521,43 @@ public class EclipseTypeSpaceLoader implements ITypeSpaceLoader,
 		return m_changedTypes;
 	}
 
-	/**
-	 * Process workspace resources changes.
-	 * 
-	 */
-	public void resourceChanged(IResourceChangeEvent event) {
-
-		int type = event.getType();
-
-		IProject project = getProject(event);
-		if (!isStarted() || !m_tsmgr.isAllowChanges() || project==null) {
-			return;
-		}
-
-		// process close project event.
-		if (type == IResourceChangeEvent.PRE_CLOSE
-				|| type == IResourceChangeEvent.PRE_DELETE) {
-
-			updateGroupDepends(project);
-			processCloseProject(event);
-			// TODO after close build dependent projects
-		}
-
-		// process add/modify/delete resources events.
-		if (type == IResourceChangeEvent.POST_CHANGE) {
-
-			if (isBildPathChangedEvent(event.getDelta())) {
-				updateGroupDepends(project);
-				new TypeSpaceReloadJob(project).schedule();
-				// m_reloadJob.schedule();
-			} else {
-				processChanges(event);
-			}
-		}
-
-	}
+//	/**
+//	 * Process workspace resources changes.
+//	 * 
+//	 */
+//	public void resourceChanged(IResourceChangeEvent event) {
+//
+//		int type = event.getType();
+//
+//		IProject project = getProject(event);
+//		if (!isStarted() || !m_tsmgr.isAllowChanges() || project==null) {
+//			return;
+//		}
+//
+//		// process close project event.
+//		if (type == IResourceChangeEvent.PRE_CLOSE
+//				|| type == IResourceChangeEvent.PRE_DELETE) {
+//
+//			updateGroupDepends(project);
+//			processCloseProject(event);
+//			// TODO after close build dependent projects
+//		}
+//
+//		// process add/modify/delete resources events.
+//		if (type == IResourceChangeEvent.POST_CHANGE) {
+//
+//			if (isBildPathChangedEvent(event.getDelta())) {
+//				updateGroupDepends(project);
+//
+//
+//				
+//				// m_reloadJob.schedule();
+//			} else {
+//				processChanges(event);
+//			}
+//		}
+//
+//	}
 
 	private IProject getProject(IResourceChangeEvent event) {
 		if (event.getDelta() != null
@@ -666,7 +666,7 @@ public class EclipseTypeSpaceLoader implements ITypeSpaceLoader,
 	 *            {@link IResourceDelta} object.
 	 * @return true if was changed ".buildpath" file only.
 	 */
-	private boolean isBildPathChangedEvent(IResourceDelta delta) {
+	public static boolean isBildPathChangedEvent(IResourceDelta delta) {
 
 		boolean isBuildPathCnahgedEvent = false;
 		IResource resource = delta.getResource();
@@ -921,19 +921,19 @@ public class EclipseTypeSpaceLoader implements ITypeSpaceLoader,
 			}
 			// Check if the jar has been added into list
 			if (!classPaths.contains(fileName)) {
-				List<String> srcPaths = new ArrayList<String>();
-				srcPaths.add(file.getPath());
-
+				SourcePathInfo srcPathInfo = new SourcePathInfo();
+				srcPathInfo.addSourcePath(file.getPath());
 				info.add(new GroupInfo(file.getName(), file.getAbsolutePath(),
-						srcPaths, null, groupDependency.get(file.getName())));
+						srcPathInfo, null, groupDependency.get(file.getName())));
 				classPaths.add(fileName);
 				System.out.println("ScriptProject<" + project.getElementName()
 						+ "> depends on :" + u);
 			}
 		}
 		// initialize src path
-		List<String> srcPaths = PiggyBackClassPathUtil
+		SourcePathInfo srcPathInfo =  PiggyBackClassPathUtil
 				.getProjectSrcPath_DLTK(project);
+		List<String> srcPaths =srcPathInfo.getSourcePaths();
 
 		String name = project.getProject().getName();
 		java.io.File groupPath = project.getProject().getLocation().toFile();
@@ -944,7 +944,7 @@ public class EclipseTypeSpaceLoader implements ITypeSpaceLoader,
 			portableString = getRelativeProjectPath(project, bootstrapPath);
 			bootstrapDirs.add(portableString);
 		}
-		info.add(new GroupInfo(name, groupPath.getAbsolutePath(), srcPaths,
+		info.add(new GroupInfo(name, groupPath.getAbsolutePath(), srcPathInfo,
 				classPaths, groupDependency.get(name), bootstrapDirs));
 	}
 

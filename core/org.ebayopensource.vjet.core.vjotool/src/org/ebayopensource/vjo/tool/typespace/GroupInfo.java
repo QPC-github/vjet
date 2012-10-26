@@ -21,18 +21,18 @@ import java.util.List;
 public class GroupInfo {
 
 	private String m_groupName;
-	private List<String> m_srcPath;
+	private SourcePathInfo m_srcPath;
 	private List<String> m_classPath;
 	private String m_groupPath;
 	private List<String> m_directDependency;
 	private List<String> m_bootstrapPath;
 	
-	public GroupInfo(String grpName, String groupPath, List<String> srcPath,
+	public GroupInfo(String grpName, String groupPath, SourcePathInfo srcPath,
 			List<String> classPath, final List<String> directDependency) {
 		this(grpName, groupPath,  srcPath,
 			 classPath,  directDependency, null);
 	}
-	public GroupInfo(String grpName, String groupPath, List<String> srcPath,
+	public GroupInfo(String grpName, String groupPath, SourcePathInfo srcPath,
 			List<String> classPath, final List<String> directDependency, List<String> bootStrapPath) {
 		m_groupName = grpName;
 		m_srcPath = srcPath;
@@ -50,11 +50,11 @@ public class GroupInfo {
 		m_groupName = groupName;
 	}
 
-	public List<String> getSrcPath() {
+	public SourcePathInfo getSrcPath() {
 		return m_srcPath;
 	}
 
-	public void setSrcPath(List<String> srcPath) {
+	public void setSrcPath(SourcePathInfo srcPath) {
 		m_srcPath = srcPath;
 	}
 

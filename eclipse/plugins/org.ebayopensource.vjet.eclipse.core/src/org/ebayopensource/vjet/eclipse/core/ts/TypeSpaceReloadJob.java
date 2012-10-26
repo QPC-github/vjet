@@ -43,19 +43,19 @@ public class TypeSpaceReloadJob extends WorkspaceJob {
 	@Override
 	public IStatus runInWorkspace(IProgressMonitor monitor)
 			throws CoreException {
-		TypeSpaceMgr mgr = TypeSpaceMgr.getInstance();
-		try {
-			TypeSpaceTracer.loadReloadEvent(mgr);
-			if(m_project!=null){
-				mgr.reloadGroup(new EclipseTypeLoadMonitor(monitor), m_project.getName(), null);
-				m_project.build(IncrementalProjectBuilder.FULL_BUILD, new SubProgressMonitor(monitor,1));
-			}else{
-				mgr.reload(new EclipseTypeLoadMonitor(monitor), null);
-			}
-			
-		} catch (Exception e) {
-			DLTKCore.error(e.getMessage(), e);
-		}
+//		TypeSpaceMgr mgr = TypeSpaceMgr.getInstance();
+//		try {
+//			TypeSpaceTracer.loadReloadEvent(mgr);
+//			if(m_project!=null){
+//				mgr.reloadGroup(new EclipseTypeLoadMonitor(monitor), m_project.getName(), null);
+//				m_project.build(IncrementalProjectBuilder.FULL_BUILD, new SubProgressMonitor(monitor,1));
+//			}else{
+//				mgr.reload(new EclipseTypeLoadMonitor(monitor), null);
+//			}
+//			
+//		} catch (Exception e) {
+//			DLTKCore.error(e.getMessage(), e);
+//		}
 		return Status.OK_STATUS;
 	}
 

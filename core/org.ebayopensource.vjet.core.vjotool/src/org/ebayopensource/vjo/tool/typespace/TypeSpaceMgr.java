@@ -80,7 +80,7 @@ public class TypeSpaceMgr {
 
 	private Collection<TypeSpaceListener> m_listeners = new ArrayList<TypeSpaceListener>();
 
-	private volatile boolean m_loaded;
+	private volatile boolean m_loaded = true;
 
 	private volatile boolean m_fullyLoaded = false;
 
@@ -187,10 +187,10 @@ public class TypeSpaceMgr {
 	 * @param callback
 	 *            {@link ISourceEventCallback} call back object.
 	 */
-	public void processEvent(ISourceEvent<IEventListenerHandle> event,
+	public static void processEvent(ISourceEvent<IEventListenerHandle> event,
 			ISourceEventCallback<IJstType> callback) {
 		try {
-			getController().getJstTypeSpaceMgr().processEvent(event, callback);
+			TypeSpaceMgr.getInstance().getController().getJstTypeSpaceMgr().processEvent(event, callback);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
@@ -230,7 +230,7 @@ public class TypeSpaceMgr {
 	public AddGroupEvent createGroupEvent(GroupInfo group, List<String> groups) {
 
 		if (!groups.contains(group.getGroupName())
-				&& !group.getSrcPath().isEmpty()) {
+				&& group.getSrcPath()!=null) {
 			groups.add(group.getGroupName());
 			return createGroupEvent(group);
 		}
@@ -247,7 +247,8 @@ public class TypeSpaceMgr {
 	 */
 	private AddGroupEvent createGroupEvent(GroupInfo group) {
 		return new AddGroupEvent(group.getGroupName(), group.getGroupPath(),
-				group.getSrcPath(), group.getClassPath(), group.getDirectDependency(), group.getBootstrapPath());
+				group.getSrcPath().getSourcePaths(), group.getClassPath(), group.getDirectDependency(), group.getBootstrapPath(),
+				group.getSrcPath().getInclusionRules(), group.getSrcPath().getExclusionRules());
 	}
 
 	/**
@@ -668,8 +669,8 @@ public class TypeSpaceMgr {
 	 *            {@link TypeName} object.
 	 * @return true if exist type in type space with specified type name object.
 	 */
-	public boolean existType(TypeName typeName) {
-		return findType(typeName) != null;
+	public static boolean existType(TypeName typeName) {
+		return TypeSpaceMgr.getInstance().findType(typeName) != null;
 	}
 
 	/**
@@ -906,7 +907,7 @@ public class TypeSpaceMgr {
 	 * @param callback
 	 *            {@link ISourceEventCallback} object.
 	 */
-	private void doProcessType(SourceTypeName name,
+	public static void doProcessType(SourceTypeName name,
 			ISourceEventCallback<IJstType> callback) {
 
 		TypeName typeName = new TypeName(name.groupName(), name.typeName());
@@ -919,7 +920,9 @@ public class TypeSpaceMgr {
 
 		switch (action) {
 		case SourceTypeName.ADDED:
-			IJstType type = findType(name);
+//			IJstType type = findType(name);
+			IJstType type =  TypeSpaceMgr.getInstance().getController().getJstTypeSpaceMgr().getQueryExecutor()
+					.findType(typeName);
 			AddTypeEvent addEvent = null;
 			if (type == null) {
 				 addEvent = new AddTypeEvent(name.groupName(), name
@@ -953,7 +956,7 @@ public class TypeSpaceMgr {
 	 *            {@link SourceTypeName} object.
 	 * @return true if changed type not exist in type space.
 	 */
-	private boolean isChangedTypeNotExist(SourceTypeName name) {
+	private static boolean isChangedTypeNotExist(SourceTypeName name) {
 		return name.getAction() == SourceTypeName.CHANGED && !existType(name);
 	}
 

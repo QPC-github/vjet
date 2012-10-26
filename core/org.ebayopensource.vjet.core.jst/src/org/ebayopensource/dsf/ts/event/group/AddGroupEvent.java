@@ -30,6 +30,8 @@ public final class AddGroupEvent extends GroupEvent {
 	private final List<String> m_srcPathList;
 	private final List<String> m_directDependency;
 	private List<String> m_bootstrapList;
+	private List<String> m_srcPathExclusionPatterns;
+	private List<String> m_srcPathInclusionPatterns;
 
 	//
 	// Constructors
@@ -119,14 +121,25 @@ public final class AddGroupEvent extends GroupEvent {
 	 * @param classPaths List<String> - list of classpaths used by this group
 	 * @param directDependency - the projects/libraries the group depends on
 	 * @param bootstrapList - the bootstrap source directories for adding extensions
+	 * @param inclusionList - List of patterns which should be included under source paths
+	 * @param exclusionList - List of patterns which should be excluded under source paths
+	 * @param list2 
+	 * @param list 
 	 */
 	public AddGroupEvent(final String groupName, final String groupPath, final List<String> srcPathList, 
-			final List<String> classPaths, final List<String> directDependency, List<String> bootstrapList){
+			final List<String> classPaths, final List<String> directDependency, List<String> bootstrapList, List<String> inclusionList, List<String> exclusionList){
 		super(groupName, groupPath);
 		m_srcPathList = srcPathList;
 		m_classPathList = classPaths;
 		m_directDependency = directDependency;
 		m_bootstrapList = bootstrapList;
+		m_srcPathExclusionPatterns = exclusionList;
+		m_srcPathInclusionPatterns = inclusionList;
+	}
+	
+	public AddGroupEvent(final String groupName, final String groupPath, final List<String> srcPathList, 
+			final List<String> classPaths, final List<String> directDependency, List<String> bootstrapList){
+		this(groupName,groupPath,srcPathList,classPaths,directDependency,bootstrapList,null,null);
 	}
 	
 	/**
@@ -139,6 +152,13 @@ public final class AddGroupEvent extends GroupEvent {
 		}
 		
 		return false;		
+	}
+	
+	public boolean addSrcPathExclusionRule(String excludePattern){
+		if(m_srcPathExclusionPatterns!=null){
+			return m_srcPathExclusionPatterns.add(excludePattern);
+		}
+		return false;
 	}
 	
 	/**
@@ -227,4 +247,16 @@ public final class AddGroupEvent extends GroupEvent {
 	}
 	
 	public boolean shouldLock() { return false; }
+
+	public List<String> getSrcPathInclusionPatterns() {
+		return m_srcPathInclusionPatterns;
+	}
+
+	public List<String> getSrcPathExclusionPatterns() {
+		return m_srcPathExclusionPatterns;
+	}
+	public void setSrcPathInclusionPatterns(
+			List<String> m_srcPathInclusionPatterns) {
+		this.m_srcPathInclusionPatterns = m_srcPathInclusionPatterns;
+	}
 }

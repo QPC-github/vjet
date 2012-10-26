@@ -13,13 +13,14 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- 
+
  *******************************************************************************/
 package org.ebayopensource.vjet.eclipse.core.builder;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,10 +32,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.ebayopensource.vjet.eclipse.codeassist.CodeassistUtils;
 import org.ebayopensource.vjet.eclipse.core.VjetPlugin;
+import org.ebayopensource.vjet.eclipse.core.VjoLanguageToolkit;
+import org.ebayopensource.vjet.eclipse.core.parser.VjoParserToJstAndIType;
+import org.ebayopensource.vjet.eclipse.core.ts.EclipseTypeSpaceLoader;
+import org.ebayopensource.vjo.tool.typespace.SourceTypeName;
+import org.ebayopensource.vjo.tool.typespace.TypeSpaceMgr;
+import org.eclipse.core.internal.resources.ResourceException;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
@@ -86,12 +96,11 @@ public class VjetScriptBuilder extends ScriptBuilder {
 	public long lastBuildResources = 0;
 	public long lastBuildSourceFiles = 0;
 	private TypeSpaceBuilder typeSpaceBuilder = new TypeSpaceBuilder();
-	
-	
 
 	static class ResourceVisitor implements IResourceDeltaVisitor,
 			IResourceVisitor {
 		final Set resources = new HashSet();
+		List<SourceTypeName> changedTypes = new ArrayList<SourceTypeName>();
 		private final IProgressMonitor monitor;
 
 		public ResourceVisitor(IProgressMonitor monitor) {
@@ -103,21 +112,128 @@ public class VjetScriptBuilder extends ScriptBuilder {
 				return false;
 			}
 			IResource resource = delta.getResource();
+
 			if (resource.getType() == IResource.FOLDER) {
 				this.monitor
 						.subTask(Messages.ScriptBuilder_scanningProjectFolder
 								+ resource.getProjectRelativePath().toString());
 			}
 			if (resource.getType() == IResource.FILE) {
+				SourceTypeName name;
+				IFile file = (IFile) resource;
+				TypeSpaceMgr tsmgr = TypeSpaceMgr.getInstance();
+				if (file.exists()) {
+					name = createSourceTypeName(file);
+				} else {
+					name = createSourceTypeName(file,
+							SourceTypeName.EMPTY_CONTENT);
+				}
+
+				String typeName = CodeassistUtils.getClassName(file);
+
 				switch (delta.getKind()) {
 				case IResourceDelta.ADDED:
-				case IResourceDelta.CHANGED:
+					if (!tsmgr.existType(file.getProject().getName(), typeName)) {
+						name.setAction(SourceTypeName.ADDED);
+						// TODO should we do this during visit or defer?
+						changedTypes.add(name);
+						if (file.exists()) {
+							tsmgr.getController().parseAndResolve(
+									name.groupName(),
+									file.getLocation().toFile());
+						}
+					}
 					resources.add(resource);
 					break;
+				case IResourceDelta.CHANGED:
+					if (tsmgr.existType(file.getProject().getName(), typeName)) {
+						name.setAction(SourceTypeName.CHANGED);
+						changedTypes.add(name);
+					}
+					resources.add(resource);
+					break;
+				case IResourceDelta.REMOVED:
+					if (tsmgr.existType(file.getProject().getName(), typeName)) {
+						name.setAction(SourceTypeName.REMOVED);
+						changedTypes.add(name);
+					}
+					break;
+
 				}
 				return false;
 			}
 			return true;
+		}
+
+		private SourceTypeName createSourceTypeName(IFile file) {
+			byte[] content = SourceTypeName.EMPTY_CONTENT;
+
+			content = getFileContent(file);
+
+			return createSourceTypeName(file, content);
+		}
+
+		private byte[] doGetFileContent(IFile file) throws CoreException,
+				IOException {
+			InputStream stream = file.getContents();
+			int available = stream.available();
+			byte[] bs = new byte[available];
+			stream.read(bs);
+			stream.close();
+			return bs;
+		}
+
+		private SourceTypeName createSourceTypeName(IFile file, byte[] bs) {
+			String group = file.getProject().getName();
+
+			String source = new String(bs);
+			String name = CodeassistUtils.getClassName(file);
+			// SourceTypeName typeName = new SourceTypeName(group,
+			// file.getRawLocation().toPortableString(), source);
+			SourceTypeName typeName = new SourceTypeName(group, name, source);
+			return typeName;
+		}
+		
+		private void logError(Exception e1) {
+			VjetPlugin.error(e1.getMessage(), e1);
+		}
+
+		private void refresh(IFile file) {
+			try {
+				file.refreshLocal(IResource.DEPTH_INFINITE, null);
+			} catch (CoreException e) {
+				DLTKCore.error(e.toString(), e);
+			}
+		}
+		
+		private byte[] getFileContent(IFile file) {
+			byte[] bs = SourceTypeName.EMPTY_CONTENT;
+			try {
+				bs = doGetFileContent(file);
+			} catch (IOException e) {
+				logError(e);
+			} catch (ResourceException e) {
+				refresh(file);
+				try {
+					bs = doGetFileContent(file);
+				} catch (Exception e1) {
+					logError(e1);
+				}
+			} catch (CoreException e) {
+				logError(e);
+			}
+			return bs;
+		}
+
+		private boolean isValidName(IFile file) {
+			boolean isValid = false;
+			try {
+				isValid = DLTKContentTypeManager.isValidFileNameForContentType(
+						VjoLanguageToolkit.getDefault(), file.getLocation());
+			} catch (Exception e) {
+				DLTKCore.error(e.getMessage(), e);
+			}
+			return isValid;
 		}
 
 		public boolean visit(IResource resource) {
@@ -195,7 +311,7 @@ public class VjetScriptBuilder extends ScriptBuilder {
 	public static void buildStarting() {
 		if (VjetPlugin.DEBUG)
 			System.out.println("vjet build starting"); //$NON-NLS-1$
-		
+
 	}
 
 	/**
@@ -218,15 +334,11 @@ public class VjetScriptBuilder extends ScriptBuilder {
 
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor)
 			throws CoreException {
-		
-	
-		
+
 		this.currentProject = getProject();
 		if (currentProject == null || !currentProject.isAccessible())
 			return new IProject[0];
-		
-		
-		
+
 		if (!DLTKLanguageManager.hasScriptNature(this.currentProject)) {
 			return null;
 		}
@@ -236,12 +348,9 @@ public class VjetScriptBuilder extends ScriptBuilder {
 			log("\nStarting build of " + this.currentProject.getName() //$NON-NLS-1$
 					+ " @ " + new Date(startTime)); //$NON-NLS-1$
 		}
-		
-		
-		
+
 		this.scriptProject = (ScriptProject) DLTKCore.create(currentProject);
-		
-		
+
 		final String version = currentProject
 				.getPersistentProperty(PROPERTY_BUILDER_VERSION);
 		if (version == null) {
@@ -276,6 +385,16 @@ public class VjetScriptBuilder extends ScriptBuilder {
 				if (delta == null) {
 					if (DEBUG)
 						log("Performing full build since deltas are missing after incremental request"); //$NON-NLS-1$
+					fullBuild(monitor);
+				} else if (VjoParserToJstAndIType.getJstParseController()
+						.getJstTypeSpaceMgr().getTypeSpace()
+						.getGroup(currentProject.getName()) == null) {
+					if (DEBUG)
+						log("Performing full build since group was not found in typespace"); //$NON-NLS-1$
+					fullBuild(monitor);
+				} else if (EclipseTypeSpaceLoader.isBildPathChangedEvent(delta)) {
+					if (DEBUG)
+						log("Performing full build since build path changed"); //$NON-NLS-1$
 					fullBuild(monitor);
 				} else {
 					if (DEBUG)
@@ -375,32 +494,32 @@ public class VjetScriptBuilder extends ScriptBuilder {
 		if (currentProject == null || !currentProject.isAccessible())
 			return;
 
-//		try {
-			monitor.beginTask(MessageFormat.format(
-					Messages.ScriptBuilder_cleaningScriptsIn,
-					new Object[] { currentProject.getName() }), 66);
-			if (monitor.isCanceled()) {
-				return;
-			}
+		// try {
+		monitor.beginTask(MessageFormat.format(
+				Messages.ScriptBuilder_cleaningScriptsIn,
+				new Object[] { currentProject.getName() }), 66);
+		if (monitor.isCanceled()) {
+			return;
+		}
 
-//			IScriptBuilder[] builders = getScriptBuilders();
-//
-//			if (builders != null) {
-//				for (int k = 0; k < builders.length; k++) {
-//					IProgressMonitor sub = new SubProgressMonitor(monitor, 1);
-//					builders[k].clean(scriptProject, sub);
-//
-//					if (monitor.isCanceled()) {
-//						break;
-//					}
-//				}
-//			}
-//			resetBuilders(builders);
-//		} catch (CoreException e) {
-//			if (DLTKCore.DEBUG) {
-//				e.printStackTrace();
-//			}
-//		}
+		// IScriptBuilder[] builders = getScriptBuilders();
+		//
+		// if (builders != null) {
+		// for (int k = 0; k < builders.length; k++) {
+		// IProgressMonitor sub = new SubProgressMonitor(monitor, 1);
+		// builders[k].clean(scriptProject, sub);
+		//
+		// if (monitor.isCanceled()) {
+		// break;
+		// }
+		// }
+		// }
+		// resetBuilders(builders);
+		// } catch (CoreException e) {
+		// if (DLTKCore.DEBUG) {
+		// e.printStackTrace();
+		// }
+		// }
 
 		if (TRACE) {
 			System.out
@@ -460,9 +579,10 @@ public class VjetScriptBuilder extends ScriptBuilder {
 		return result;
 	}
 
-	public org.eclipse.dltk.mod.internal.core.builder.State getLastState(IProject project, IProgressMonitor monitor) {
-		return (org.eclipse.dltk.mod.internal.core.builder.State) ModelManager.getModelManager().getLastBuiltState(
-				project, monitor);
+	public org.eclipse.dltk.mod.internal.core.builder.State getLastState(
+			IProject project, IProgressMonitor monitor) {
+		return (org.eclipse.dltk.mod.internal.core.builder.State) ModelManager
+				.getModelManager().getLastBuiltState(project, monitor);
 	}
 
 	private State clearLastState() {
@@ -493,21 +613,22 @@ public class VjetScriptBuilder extends ScriptBuilder {
 		IScriptBuilder[] builders = null;
 		try {
 			monitor.setTaskName(NLS.bind(
-					Messages.ScriptBuilder_buildingScriptsIn, currentProject
-							.getName()));
-			
-			
+					Messages.ScriptBuilder_buildingScriptsIn,
+					currentProject.getName()));
 
 			List<String> groupDepends = new ArrayList<String>();
-			IBuildpathEntry bootstrapPath = TypeSpaceBuilder.getBootstrapDir(scriptProject);
-			TypeSpaceBuilder.getSerFileGroupDepends(scriptProject, groupDepends);
+			IBuildpathEntry bootstrapPath = TypeSpaceBuilder
+					.getBootstrapDir(scriptProject);
+			TypeSpaceBuilder
+					.getSerFileGroupDepends(scriptProject, groupDepends);
 
-			this.typeSpaceBuilder.buildProject(scriptProject, null, monitor, groupDepends, bootstrapPath);
-			
+			this.typeSpaceBuilder.buildProject(scriptProject, null, monitor,
+					groupDepends, bootstrapPath);
+
 			monitor.beginTask(NONAME, WORK_RESOURCES + WORK_EXTERNAL
 					+ WORK_SOURCES + WORK_BUILD);
 			Set resources = getResourcesFrom(currentProject, monitor,
-					WORK_RESOURCES);
+					WORK_RESOURCES).resources;
 			if (monitor.isCanceled()) {
 				return;
 			}
@@ -592,7 +713,7 @@ public class VjetScriptBuilder extends ScriptBuilder {
 		}
 	}
 
-	private Set getResourcesFrom(Object el, final IProgressMonitor monitor,
+	private ResourceVisitor getResourcesFrom(Object el, final IProgressMonitor monitor,
 			int ticks) throws CoreException {
 		monitor.subTask(Messages.ScriptBuilder_scanningProject);
 		try {
@@ -604,7 +725,7 @@ public class VjetScriptBuilder extends ScriptBuilder {
 				IResourceDelta delta = (IResourceDelta) el;
 				delta.accept(resourceVisitor);
 			}
-			return resourceVisitor.resources;
+			return resourceVisitor;
 		} finally {
 			monitor.worked(ticks);
 		}
@@ -672,15 +793,16 @@ public class VjetScriptBuilder extends ScriptBuilder {
 		IScriptBuilder[] builders = null;
 		try {
 			monitor.setTaskName(NLS.bind(
-					Messages.ScriptBuilder_buildingScriptsIn, currentProject
-							.getName()));
+					Messages.ScriptBuilder_buildingScriptsIn,
+					currentProject.getName()));
 			monitor.beginTask(NONAME, WORK_RESOURCES + WORK_EXTERNAL
 					+ WORK_SOURCES + WORK_BUILD);
 
 			if (monitor.isCanceled()) {
 				return;
 			}
-			Set resources = getResourcesFrom(delta, monitor, WORK_RESOURCES);
+			ResourceVisitor resourcesFrom = getResourcesFrom(delta, monitor, WORK_RESOURCES);
+			Set resources = resourcesFrom.resources;
 			if (monitor.isCanceled()) {
 				return;
 			}
@@ -714,6 +836,9 @@ public class VjetScriptBuilder extends ScriptBuilder {
 			if (monitor.isCanceled()) {
 				return;
 			}
+			// TODO build the files that are dependants of the changed types
+			this.typeSpaceBuilder.incrementalBuildProject(resourcesFrom.changedTypes);
+
 			try {
 				buildElements(localElements, externalElements, monitor,
 						WORK_BUILD - resourceTicks,
@@ -786,8 +911,8 @@ public class VjetScriptBuilder extends ScriptBuilder {
 			}
 			IResource res = (IResource) iterator.next();
 			sub.subTask(NLS.bind(
-					Messages.ScriptBuilder_Locating_source_modules, String
-							.valueOf(remainingWork), res.getName()));
+					Messages.ScriptBuilder_Locating_source_modules,
+					String.valueOf(remainingWork), res.getName()));
 			sub.worked(1);
 			if (sub.isCanceled()) {
 				return;
@@ -876,8 +1001,8 @@ public class VjetScriptBuilder extends ScriptBuilder {
 				final int step = buildElementsList.size() * ticks / total;
 				builderWork -= step;
 				monitor.subTask(NLS.bind(
-						Messages.ScriptBuilder_building_N_localModules, Integer
-								.toString(buildElementsList.size())));
+						Messages.ScriptBuilder_building_N_localModules,
+						Integer.toString(buildElementsList.size())));
 				builder.buildModelElements(scriptProject, buildElementsList,
 						new SubProgressMonitor(monitor, step), buildTypes[k]);
 			}
@@ -996,7 +1121,7 @@ public class VjetScriptBuilder extends ScriptBuilder {
 
 	private List collectLocalElements() throws CoreException {
 		final IProgressMonitor nullMon = new NullProgressMonitor();
-		final Set resources = getResourcesFrom(currentProject, nullMon, 1);
+		final Set resources = getResourcesFrom(currentProject, nullMon, 1).resources;
 		final List elements = new ArrayList();
 		locateSourceModules(nullMon, 1, resources, elements, new ArrayList());
 		return elements;
@@ -1029,5 +1154,4 @@ public class VjetScriptBuilder extends ScriptBuilder {
 		return state;
 	}
 
-		
 }

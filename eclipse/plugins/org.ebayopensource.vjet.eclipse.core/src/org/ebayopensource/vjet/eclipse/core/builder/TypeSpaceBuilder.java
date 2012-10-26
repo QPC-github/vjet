@@ -9,7 +9,11 @@
 package org.ebayopensource.vjet.eclipse.core.builder;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,13 +35,31 @@ import org.ebayopensource.dsf.ts.event.group.RemoveGroupEvent;
 import org.ebayopensource.vjet.eclipse.codeassist.CodeassistUtils;
 import org.ebayopensource.vjet.eclipse.core.PiggyBackClassPathUtil;
 import org.ebayopensource.vjet.eclipse.core.VjetPlugin;
+import org.ebayopensource.vjet.eclipse.core.VjoLanguageToolkit;
 import org.ebayopensource.vjet.eclipse.core.parser.VjoParserToJstAndIType;
+import org.ebayopensource.vjet.eclipse.core.ts.EclipseTypeLoadMonitor;
+import org.ebayopensource.vjet.eclipse.core.ts.TypeSpaceGroupLoadJob;
 import org.ebayopensource.vjet.eclipse.core.ts.TypeSpaceTracer;
 import org.ebayopensource.vjo.lib.TsLibLoader;
+import org.ebayopensource.vjo.tool.typespace.GroupInfo;
+import org.ebayopensource.vjo.tool.typespace.SourcePathInfo;
+import org.ebayopensource.vjo.tool.typespace.SourceTypeName;
+import org.ebayopensource.vjo.tool.typespace.TypeSpaceMgr;
+import org.eclipse.core.internal.resources.ResourceException;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.dltk.mod.core.DLTKContentTypeManager;
+import org.eclipse.dltk.mod.core.DLTKCore;
 import org.eclipse.dltk.mod.core.IBuildpathEntry;
 import org.eclipse.dltk.mod.core.IScriptProject;
 import org.eclipse.dltk.mod.core.ModelException;
+import org.eclipse.dltk.mod.internal.core.Model;
+import org.eclipse.dltk.mod.internal.core.ModelManager;
 import org.eclipse.dltk.mod.internal.core.ScriptProject;
 
 public class TypeSpaceBuilder {
@@ -51,8 +73,9 @@ public class TypeSpaceBuilder {
 		// add group event
 		String name = project.getProject().getName();
 		File groupPath = project.getProject().getLocation().toFile();
-		List<String> srcPaths = PiggyBackClassPathUtil
+		SourcePathInfo sourceInfo = PiggyBackClassPathUtil
 		.getProjectSrcPath_DLTK(project);
+		List<String> srcPaths = sourceInfo.getSourcePaths();
 		// TODO support library zip entries
 		List<String> classPaths = new ArrayList<String>();
 		
@@ -62,11 +85,20 @@ public class TypeSpaceBuilder {
 			portableString = getRelativeProjectPath(project, bootstrapPath);
 			bootstrapDirs.add(portableString);
 		}
+		List<GroupInfo> info = new ArrayList<GroupInfo>();
+		processAddGroup(info, project.getProject());
 		
-		
-		VjoParserToJstAndIType.getJstParseController().getJstTypeSpaceMgr()
-		.processEvent(new AddGroupEvent(name, groupPath.getAbsolutePath(), srcPaths,
-				classPaths, groupDepends, bootstrapDirs));
+//		TypeSpaceMgr mgr = TypeSpaceMgr.getInstance();
+//		// log list of groups being processed
+//		TypeSpaceTracer.logLoadEvent(info);
+//		mgr.load(new EclipseTypeLoadMonitor(monitor), info, null);
+//		
+		for(GroupInfo group: info){
+			VjoParserToJstAndIType.getJstParseController().getJstTypeSpaceMgr()
+			.processEvent(new AddGroupEvent(group.getGroupName(),group.getGroupPath(), group.getSrcPath().getSourcePaths(),
+					group.getClassPath(), group.getDirectDependency(), group.getBootstrapPath(), sourceInfo.getInclusionRules(), sourceInfo.getExclusionRules() ));
+				
+		}
 		
 		
 		if(VjetPlugin.TRACE_TYPESPACE){
@@ -81,8 +113,350 @@ public class TypeSpaceBuilder {
 		
 	}
 	
+	public void incrementalBuildProject(List<SourceTypeName> changedTypes) {
+
+//		IResourceDelta[] resourceDeltas = delta
+//				.getAffectedChildren();
+//		TypeSpaceMgr tsmgr =  TypeSpaceMgr.getInstance();
+//		List<GroupInfo> info = new ArrayList<GroupInfo>();
+//		List<SourceTypeName> changedTypes = new ArrayList<SourceTypeName>();
+//
+//		for (IResourceDelta resourceDelta : resourceDeltas) {
+//			IProject project = resourceDelta.getResource().getProject();
+//
+//			if (!project.exists() || !project.isOpen()) {
+//				continue;
+//			}
+//
+//			// process delta if project exist and type space loading is
+//			// finished else create add group event.
+//			if (tsmgr.existGroup(project.getName()) ) {
+//				changedTypes.addAll(processDelta(resourceDelta));
+//			} else if (tsmgr.isLoaded()) {
+//				// for (Object o :
+//				// m_tsmgr.getController().getJstTypeSpaceMgr().getTypeSpace().getGroups().keySet().toArray())
+//				// {
+//				// String s = (String)o;
+//				// if (!s.endsWith(".jar")) {
+//				// System.out.println(o);
+//				// }
+//				// }
+//				// updateGroupDepends();
+//				processAddGroup(info, project);
+//			}
+//
+//		}
+//
+//		// Calls group load job if group info list in not empty else call
+//		// refresh job for changes resources.
+//		if (!info.isEmpty()) {
+//
+//			TypeSpaceGroupLoadJob groupLoadJob = new TypeSpaceGroupLoadJob(info);
+//			tsmgr.setLoaded(false);
+//			groupLoadJob.schedule();
+
+		if(!changedTypes.isEmpty()) {
+			TypeSpaceTracer.loadRefreshEvent(changedTypes);
+			for(SourceTypeName type:changedTypes){
+				TypeSpaceMgr.doProcessType(type, null);
+				
+			}
+		}
+
+	}
 	
-	private String getRelativeProjectPath(IScriptProject project, IBuildpathEntry bootstrap) {
+	public static void processAddGroup(List<GroupInfo> info, IProject project) {
+
+		try {
+			IScriptProject scriptProject;
+			Model model =  ModelManager.getModelManager().getModel();
+			scriptProject = model.getScriptProject(project.getName());
+			if (scriptProject.exists()) {
+				Map<String, List<String>> groups = new HashMap<String,List<String>>();
+				createDepends(groups, scriptProject);
+				populateGroupInfos(info, scriptProject, groups);
+			}
+		} catch (ModelException e) {
+			DLTKCore.error(e.getMessage(), e);
+		}
+	}
+	
+	private static IBuildpathEntry[] createDepends(Map<String, List<String>> groups,
+			IScriptProject project) throws ModelException {
+
+		List<String> list = getDependsProjects(groups, project.getElementName());
+
+		IBuildpathEntry[] entries = TypeSpaceBuilder.getSerFileGroupDepends(
+				project, list);
+
+		groups.put(project.getElementName(), list);
+
+		return entries;
+	}
+	
+	private static List<String> getDependsProjects(Map<String, List<String>> groups,
+			String group) {
+		List<String> list = groups.get(group);
+		if (list == null) {
+			list = new ArrayList<String>();
+			groups.put(group, list);
+		}
+		return list;
+	}
+
+	private List<SourceTypeName> loadFile(IResourceDelta delta, IResource resource) {
+		IFile file = (IFile) resource;
+		
+		SourceTypeName name = null;
+		if (isValidFile(file)) {
+			return loadVjoFile(delta, file);
+		}
+		return null;
+	}
+	
+	private boolean isValidFile(IFile file) {
+		return isValidName(file)
+				&& PiggyBackClassPathUtil.isInSourceFolder(file);
+	}
+	
+	private boolean isValidName(IFile file) {
+		boolean isValid = false;
+		try {
+			isValid = DLTKContentTypeManager.isValidFileNameForContentType(
+					VjoLanguageToolkit.getDefault(), file.getLocation());
+		} catch (Exception e) {
+			DLTKCore.error(e.getMessage(), e);
+		}
+		return isValid;
+	}
+
+	private SourceTypeName createSourceTypeName(IFile file) {
+		byte[] content = SourceTypeName.EMPTY_CONTENT;
+
+		content = getFileContent(file);
+
+		return createSourceTypeName(file, content);
+	}
+
+	private byte[] getFileContent(IFile file) {
+		byte[] bs = SourceTypeName.EMPTY_CONTENT;
+		try {
+			bs = doGetFileContent(file);
+		} catch (IOException e) {
+			logError(e);
+		} catch (ResourceException e) {
+			refresh(file);
+			try {
+				bs = doGetFileContent(file);
+			} catch (Exception e1) {
+				logError(e1);
+			}
+		} catch (CoreException e) {
+			logError(e);
+		}
+		return bs;
+	}
+	
+	/**
+	 * Refresh file from the disk to workspace.
+	 * 
+	 * @param file
+	 *            {@link IFile} object.
+	 */
+	private void refresh(IFile file) {
+		try {
+			file.refreshLocal(IResource.DEPTH_INFINITE, null);
+		} catch (CoreException e) {
+			DLTKCore.error(e.toString(), e);
+		}
+	}
+	
+	private void logError(Exception e1) {
+		DLTKCore.error(e1.getMessage(), e1);
+	}
+
+	/**
+	 * Read content of the {@link IFile} object to the bytes array.
+	 * 
+	 * @param file
+	 *            {@link IFile}
+	 * @return file content in bytes array.
+	 * @throws CoreException
+	 * @throws IOException
+	 */
+	private byte[] doGetFileContent(IFile file) throws CoreException,
+			IOException {
+		InputStream stream = file.getContents();
+		int available = stream.available();
+		byte[] bs = new byte[available];
+		stream.read(bs);
+		stream.close();
+		return bs;
+	}
+	
+	private SourceTypeName createSourceTypeName(IFile file, byte[] bs) {
+		String group = file.getProject().getName();
+
+		String source = new String(bs);
+		String name = CodeassistUtils.getClassName(file);
+		// SourceTypeName typeName = new SourceTypeName(group,
+		// file.getRawLocation().toPortableString(), source);
+		SourceTypeName typeName = new SourceTypeName(group, name, source);
+		return typeName;
+	}
+	
+	/**
+	 * Create for {@link File} object corresponding {@link SourceTypeName}
+	 * object and adding to the inner list of changed types.
+	 * 
+	 * @param delta
+	 *            {@link IResourceDelta} object
+	 * @param file
+	 *            {@link File} object.
+	 */
+	private List<SourceTypeName> loadVjoFile(IResourceDelta delta, IFile file) {
+		SourceTypeName name;
+		List<SourceTypeName> changedTypes = new ArrayList<SourceTypeName>();
+		TypeSpaceMgr tsmgr =  TypeSpaceMgr.getInstance();
+		if (file.exists()) {
+			name = createSourceTypeName(file);
+		} else {
+			name = createSourceTypeName(file, SourceTypeName.EMPTY_CONTENT);
+		}
+
+		String typeName = CodeassistUtils.getClassName(file);
+
+		switch (delta.getKind()) {
+		case IResourceDelta.ADDED:
+			if (!tsmgr.existType(file.getProject().getName(), typeName)) {
+				name.setAction(SourceTypeName.ADDED);
+				changedTypes.add(name);
+				if (file.exists()) {
+					tsmgr.getController().parseAndResolve(name.groupName(),
+							file.getLocation().toFile());
+				}
+			}
+			break;
+		case IResourceDelta.CHANGED:
+			if (tsmgr.existType(file.getProject().getName(), typeName)) {
+				name.setAction(SourceTypeName.CHANGED);
+				changedTypes.add(name);
+			}
+
+			break;
+		case IResourceDelta.REMOVED:
+			if (tsmgr.existType(file.getProject().getName(), typeName)) {
+				name.setAction(SourceTypeName.REMOVED);
+				changedTypes.add(name);
+			}
+			break;
+		default:
+			break;
+		}
+		
+		return changedTypes;
+		// return !(delta.getKind() == IResourceDelta.ADDED &&
+		// m_tsmgr.existType(file.getProject().getName(), typeName));
+
+	}
+	
+	private List<SourceTypeName> processDelta(IResourceDelta delta) {
+		IResource resource = delta.getResource();
+
+		// fix typespace not updated after refactor finished
+		List<SourceTypeName> changedTypes = new ArrayList<SourceTypeName>();
+		if (resource instanceof IFile) {
+			switch (delta.getKind()) {
+			case IResourceDelta.CHANGED:
+				if ((delta.getFlags() & ~(IResourceDelta.SYNC | IResourceDelta.MARKERS)) != 0) {
+					changedTypes.addAll(loadFile(delta, resource));
+				}
+				break;
+			case IResourceDelta.ADDED:
+				changedTypes.addAll(loadFile(delta, resource));
+				break;
+			case IResourceDelta.REMOVED:
+				changedTypes.addAll(loadFile(delta, resource));
+				break;
+			default:
+				break;
+			}
+		} else if (PiggyBackClassPathUtil.isInSourceFolder(resource)
+				|| resource instanceof IProject) {
+			IResourceDelta[] deltas = delta.getAffectedChildren();
+			for (IResourceDelta resourceDelta : deltas) {
+				changedTypes.addAll(processDelta(resourceDelta));
+			}
+		}
+		return changedTypes;
+
+	}
+	
+	private static void populateGroupInfos(final List<GroupInfo> info,
+			final IScriptProject project,
+			final Map<String, List<String>> groupDependency)
+			throws ModelException {
+		
+		
+		// initialize dltk build path
+		if (!PiggyBackClassPathUtil
+				.ifScriptProjectInitializedFromJavaProject(project)) {
+			PiggyBackClassPathUtil
+					.initializeScriptProjectFromJavProject(project);
+		}
+		// initialize dependant jars
+
+		List<String> classPaths = new ArrayList<String>();
+
+		List<URL> urls = PiggyBackClassPathUtil
+				.getProjectDependantJars_DLTK(project);
+
+		List<String> groupDepends = new ArrayList<String>();
+		TypeSpaceBuilder.getSerFileGroupDepends(project, groupDepends);
+
+		IBuildpathEntry bootstrapPath = TypeSpaceBuilder
+				.getBootstrapDir(project);
+
+		for (URL u : urls) {
+			java.io.File file = new java.io.File(u.getFile());
+			String fileName = file.getName();
+			// Skip the file which has been calculated into type space
+			if (TypeSpaceMgr.getInstance().existGroup(fileName)) {
+				continue;
+			}
+			// Check if the jar has been added into list
+			if (!classPaths.contains(fileName)) {
+				SourcePathInfo srcPathInfo = new SourcePathInfo();
+				srcPathInfo.addSourcePath(file.getPath());
+				
+
+				info.add(new GroupInfo(file.getName(), file.getAbsolutePath(),
+						srcPathInfo, null, groupDependency.get(file.getName())));
+				classPaths.add(fileName);
+				System.out.println("ScriptProject<" + project.getElementName()
+						+ "> depends on :" + u);
+			}
+		}
+		// initialize src path
+		SourcePathInfo sourcePathInfo = PiggyBackClassPathUtil
+				.getProjectSrcPath_DLTK(project);
+		List<String> srcPaths = sourcePathInfo.getSourcePaths();
+
+		String name = project.getProject().getName();
+		java.io.File groupPath = project.getProject().getLocation().toFile();
+
+		List<String> bootstrapDirs = new ArrayList<String>();
+		if (bootstrapPath != null) {
+			String portableString = "";
+			portableString = getRelativeProjectPath(project, bootstrapPath);
+			bootstrapDirs.add(portableString);
+		}
+		info.add(new GroupInfo(name, groupPath.getAbsolutePath(), sourcePathInfo,
+				classPaths, groupDependency.get(name), bootstrapDirs));
+	}
+
+	
+	private static String getRelativeProjectPath(IScriptProject project, IBuildpathEntry bootstrap) {
 		String name = project.getElementName();
 		String bootstrapPath = bootstrap.getPath().toPortableString();
 		if (bootstrapPath.lastIndexOf(name) != -1) {

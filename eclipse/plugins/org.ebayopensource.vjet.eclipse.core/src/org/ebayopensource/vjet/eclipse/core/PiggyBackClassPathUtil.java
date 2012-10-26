@@ -24,6 +24,7 @@ import java.util.zip.ZipFile;
 import org.ebayopensource.dsf.jst.ts.util.ISdkEnvironment;
 import org.ebayopensource.vjet.eclipse.codeassist.CodeassistUtils;
 import org.ebayopensource.vjet.eclipse.core.sdk.VJetSdkEnvironment;
+import org.ebayopensource.vjo.tool.typespace.SourcePathInfo;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
@@ -221,17 +222,23 @@ public class PiggyBackClassPathUtil {
 
 	}
 
-	public static List<String> getProjectSrcPath_DLTK(IScriptProject vProject) {
-		List<String> srcPaths = new ArrayList<String>();
+	public static SourcePathInfo getProjectSrcPath_DLTK(IScriptProject vProject) {
+		SourcePathInfo srcPaths = new SourcePathInfo();
 		String name = vProject.getProject().getName();
 		IBuildpathEntry[] entries = getResolvedBuildpath(vProject);
-
-		List<IPath> folders = new ArrayList<IPath>();
 
 		for (IBuildpathEntry entry : entries) {
 			if (entry.getEntryKind() != IBuildpathEntry.BPE_SOURCE) {
 				continue;
 			}
+			
+			for(IPath inclusion : entry.getInclusionPatterns()){
+				srcPaths.addInclusionRule(inclusion.toPortableString());
+			}
+			for(IPath exclusion : entry.getExclusionPatterns()){
+				srcPaths.addExclusionRule(exclusion.toPortableString());
+			}
+			
 			String portableString = entry.getPath().toPortableString();
 
 			if (portableString.lastIndexOf(name) != -1) {
@@ -244,7 +251,7 @@ public class PiggyBackClassPathUtil {
 
 				}
 			}
-			srcPaths.add(portableString);
+			srcPaths.addSourcePath(portableString);
 		}
 		return srcPaths;
 	}
@@ -602,7 +609,7 @@ public class PiggyBackClassPathUtil {
 	 */
 	public static boolean isInSourceFolder(IResource resource) {
 		List<String> list = PiggyBackClassPathUtil
-				.getProjectSrcPath_DLTK(getScriptProject(resource.getProject()));
+				.getProjectSrcPath_DLTK(getScriptProject(resource.getProject())).getSourcePaths();
 
 		boolean isInSourceFolder = false;
 
