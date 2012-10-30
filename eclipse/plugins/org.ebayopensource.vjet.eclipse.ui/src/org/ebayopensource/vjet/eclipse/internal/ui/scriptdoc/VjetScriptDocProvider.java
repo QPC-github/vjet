@@ -24,6 +24,7 @@ import org.eclipse.dltk.mod.core.IField;
 import org.eclipse.dltk.mod.core.IMember;
 import org.eclipse.dltk.mod.core.IMethod;
 import org.eclipse.dltk.mod.core.IModelElement;
+import org.eclipse.dltk.mod.internal.core.VjoExternalSourceModule;
 import org.eclipse.dltk.mod.internal.core.VjoSourceModule;
 import org.eclipse.dltk.mod.internal.core.VjoSourceType;
 import org.eclipse.dltk.mod.javascript.scriptdoc.JavaDoc2HTMLTextReader;
@@ -45,21 +46,40 @@ public class VjetScriptDocProvider implements IScriptDocumentationProvider {
 		if (element instanceof VjoSourceType) {
 			VjoSourceType module = (VjoSourceType) element;
 			/// need to determine if this is a nested type? utility for this?
-			URI resource = element.getResource().getLocationURI();
-			System.out.println(resource);
-			if(resource.getScheme().equals("typespace")){
-				groupName = resource.getHost();
-			}else{
-				groupName = determineGroup(module);
-			}
-		
 			
-			typeName = module.getFullyQualifiedName(".");
-			IJstType t = TypeSpaceMgr.findType(groupName, typeName);
-			if (t != null && t.getDoc() != null) {
-				return new JavaDoc2HTMLTextReader(new StringReader(t.getDoc()
-						.getComment()));
+			
+			if(element.getResource()==null ){
+				
+				if(module.getParent() instanceof VjoExternalSourceModule){
+					VjoExternalSourceModule external = (VjoExternalSourceModule)module.getParent();
+					
+					IJstType t = external.getType();
+					if (t != null && t.getDoc() != null) {
+						return new JavaDoc2HTMLTextReader(new StringReader(t.getDoc()
+								.getComment()));
+					}
+				}
+				
+				
+			}else{
+				URI resource = element.getResource().getLocationURI();
+				System.out.println(resource);
+				if(resource.getScheme().equals("typespace")){
+					groupName = resource.getHost();
+				}else{
+					groupName = determineGroup(module);
+				}
+				typeName = module.getFullyQualifiedName(".");
+				IJstType t = TypeSpaceMgr.findType(groupName, typeName);
+				if (t != null && t.getDoc() != null) {
+					return new JavaDoc2HTMLTextReader(new StringReader(t.getDoc()
+							.getComment()));
+				}
+			
 			}
+			
+			
+			
 		}
 
 //		IType declaringType = element.getDeclaringType();
