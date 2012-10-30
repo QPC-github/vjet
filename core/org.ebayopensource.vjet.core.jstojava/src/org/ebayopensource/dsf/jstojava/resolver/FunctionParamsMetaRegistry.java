@@ -75,8 +75,15 @@ public class FunctionParamsMetaRegistry {
 	
 	private IMetaExtension getExtentedArgBinding(
 		String targetFunc, String key, String groupId) {
-		IFunctionMetaMapping mapping = m_funcMetaMappings.get(groupId);
-		return (mapping == null) ? null : mapping.getExtentedArgBinding(targetFunc, key);
+		// look though the dependencies look for names check start with
+		for(String group: m_funcMetaMappings.keySet()){
+			if(groupId.startsWith(group)){
+				IFunctionMetaMapping mapping = m_funcMetaMappings.get(group);
+				return (mapping == null) ? null : mapping.getExtentedArgBinding(targetFunc, key);
+			}
+		}
+		return null;
+		
 	}
 
 	public boolean isFirstArgumentType(String targetFunc, String groupId) {
