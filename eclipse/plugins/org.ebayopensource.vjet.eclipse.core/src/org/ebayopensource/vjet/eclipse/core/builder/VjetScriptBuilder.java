@@ -490,7 +490,15 @@ public class VjetScriptBuilder extends ScriptBuilder {
 			return;
 		}
 		this.scriptProject = (ScriptProject) DLTKCore.create(currentProject);
-
+		
+		monitor.beginTask(MessageFormat.format(
+				"Cleaning typespace for project {0}",
+				new Object[] { currentProject.getName() }), 66);
+		if (monitor.isCanceled()) {
+			return;
+		}
+		TypeSpaceMgr.getInstance().cleanGroup(this.scriptProject.getElementName());
+		
 		if (currentProject == null || !currentProject.isAccessible())
 			return;
 
@@ -502,24 +510,20 @@ public class VjetScriptBuilder extends ScriptBuilder {
 			return;
 		}
 
-		// IScriptBuilder[] builders = getScriptBuilders();
-		//
-		// if (builders != null) {
-		// for (int k = 0; k < builders.length; k++) {
-		// IProgressMonitor sub = new SubProgressMonitor(monitor, 1);
-		// builders[k].clean(scriptProject, sub);
-		//
-		// if (monitor.isCanceled()) {
-		// break;
-		// }
-		// }
-		// }
-		// resetBuilders(builders);
-		// } catch (CoreException e) {
-		// if (DLTKCore.DEBUG) {
-		// e.printStackTrace();
-		// }
-		// }
+		 IScriptBuilder[] builders = getScriptBuilders();
+		
+		 if (builders != null) {
+		 for (int k = 0; k < builders.length; k++) {
+			 IProgressMonitor sub = new SubProgressMonitor(monitor, 1);
+			 builders[k].clean(scriptProject, sub);
+		
+		 if (monitor.isCanceled()) {
+		 break;
+		 }
+		 
+		 }
+		 resetBuilders(builders);
+		 } 
 
 		if (TRACE) {
 			System.out

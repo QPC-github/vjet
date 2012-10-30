@@ -39,6 +39,7 @@ import org.ebayopensource.vjet.eclipse.core.VjoLanguageToolkit;
 import org.ebayopensource.vjet.eclipse.core.parser.VjoParserToJstAndIType;
 import org.ebayopensource.vjet.eclipse.core.ts.EclipseTypeLoadMonitor;
 import org.ebayopensource.vjet.eclipse.core.ts.TypeSpaceGroupLoadJob;
+import org.ebayopensource.vjet.eclipse.core.ts.TypeSpaceRefreshJob;
 import org.ebayopensource.vjet.eclipse.core.ts.TypeSpaceTracer;
 import org.ebayopensource.vjo.lib.TsLibLoader;
 import org.ebayopensource.vjo.tool.typespace.GroupInfo;
@@ -88,17 +89,13 @@ public class TypeSpaceBuilder {
 		List<GroupInfo> info = new ArrayList<GroupInfo>();
 		processAddGroup(info, project.getProject());
 		
-//		TypeSpaceMgr mgr = TypeSpaceMgr.getInstance();
+		TypeSpaceMgr mgr = TypeSpaceMgr.getInstance();
 //		// log list of groups being processed
-//		TypeSpaceTracer.logLoadEvent(info);
-//		mgr.load(new EclipseTypeLoadMonitor(monitor), info, null);
-//		
-		for(GroupInfo group: info){
-			VjoParserToJstAndIType.getJstParseController().getJstTypeSpaceMgr()
-			.processEvent(new AddGroupEvent(group.getGroupName(),group.getGroupPath(), group.getSrcPath().getSourcePaths(),
-					group.getClassPath(), group.getDirectDependency(), group.getBootstrapPath(), sourceInfo.getInclusionRules(), sourceInfo.getExclusionRules() ));
-				
-		}
+		TypeSpaceTracer.logLoadEvent(info);
+		mgr.load(new EclipseTypeLoadMonitor(monitor), info, null);
+
+		
+		
 		
 		
 		if(VjetPlugin.TRACE_TYPESPACE){
