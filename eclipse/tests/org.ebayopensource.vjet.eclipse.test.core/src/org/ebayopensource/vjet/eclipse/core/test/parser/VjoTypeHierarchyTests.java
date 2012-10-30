@@ -76,8 +76,10 @@ public class VjoTypeHierarchyTests extends AbstractVjoModelTests {
 
 		IType[] subtypesB1 = typeHierarchy.getSubtypes(typeB1);
 		assertEquals("Wrong subtypes number", 2, subtypesB1.length);
-		assertEquals("Wrong supertype", "test1.C", subtypesB1[0]
+		assertEquals("Wrong supertype", "test2.C", subtypesB1[1]
 				.getFullyQualifiedName());		
+		assertEquals("Wrong supertype", "test1.C", subtypesB1[0]
+				.getFullyQualifiedName());	
 	}
 	
 	/**

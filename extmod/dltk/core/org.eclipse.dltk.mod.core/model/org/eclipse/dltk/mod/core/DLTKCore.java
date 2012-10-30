@@ -57,7 +57,7 @@ public class DLTKCore extends Plugin {
 
 	// Debug/Verbose constants
 	public static final boolean VERBOSE = false;
-	public static final boolean VERBOSE_MODEL_MANAGER = false;
+	public static final boolean VERBOSE_MODEL_MANAGER = true;
 	public static final boolean VERBOSE_BP_RESOLVE = false;
 	public static final boolean VERBOSE_ZIP_ACCESS = false;
 	public static final boolean VERBOSE_EXTERNAL_FRAGMENT = false;
@@ -74,39 +74,31 @@ public class DLTKCore extends Plugin {
 
 	public static final boolean SHOW_REINDEX = Boolean
 			.valueOf(
-					Platform
-							.getDebugOption("org.eclipse.dltk.mod.core/show_reindex")).booleanValue(); //$NON-NLS-1$
+					Platform.getDebugOption("org.eclipse.dltk.mod.core/show_reindex")).booleanValue(); //$NON-NLS-1$
 
 	public static final boolean DEBUG_PRINT_MODEL = Boolean
 			.valueOf(
-					Platform
-							.getDebugOption("org.eclipse.dltk.mod.core/debugPrintModel")).booleanValue(); //$NON-NLS-1$
+					Platform.getDebugOption("org.eclipse.dltk.mod.core/debugPrintModel")).booleanValue(); //$NON-NLS-1$
 	public static final boolean DEBUG_SCOPES = Boolean
 			.valueOf(
-					Platform
-							.getDebugOption("org.eclipse.dltk.mod.core/debugScopes")).booleanValue(); //$NON-NLS-1$
+					Platform.getDebugOption("org.eclipse.dltk.mod.core/debugScopes")).booleanValue(); //$NON-NLS-1$
 	public static final boolean DEBUG_SCRIPT_BUILDER = Boolean
 			.valueOf(
-					Platform
-							.getDebugOption("org.eclipse.dltk.mod.core/debugScriptBuilder")).booleanValue(); //$NON-NLS-1$
+					Platform.getDebugOption("org.eclipse.dltk.mod.core/debugScriptBuilder")).booleanValue(); //$NON-NLS-1$
 
 	public static final boolean TRACE_SCRIPT_BUILDER = Boolean
 			.valueOf(
-					Platform
-							.getDebugOption("org.eclipse.dltk.mod.core/traceScriptBuilder")).booleanValue(); //$NON-NLS-1$
+					Platform.getDebugOption("org.eclipse.dltk.mod.core/traceScriptBuilder")).booleanValue(); //$NON-NLS-1$
 
 	public static final boolean DEBUG_COMPLETION = Boolean
 			.valueOf(
-					Platform
-							.getDebugOption("org.eclipse.dltk.mod.core/debugCompletion")).booleanValue(); //$NON-NLS-1$
+					Platform.getDebugOption("org.eclipse.dltk.mod.core/debugCompletion")).booleanValue(); //$NON-NLS-1$
 	public static final boolean DEBUG_SELECTION = Boolean
 			.valueOf(
-					Platform
-							.getDebugOption("org.eclipse.dltk.mod.core/debugSelection")).booleanValue(); //$NON-NLS-1$
+					Platform.getDebugOption("org.eclipse.dltk.mod.core/debugSelection")).booleanValue(); //$NON-NLS-1$
 	public static final boolean DEBUG_PARSER = Boolean
 			.valueOf(
-					Platform
-							.getDebugOption("org.eclipse.dltk.mod.core/debugParser")).booleanValue(); //$NON-NLS-1$
+					Platform.getDebugOption("org.eclipse.dltk.mod.core/debugParser")).booleanValue(); //$NON-NLS-1$
 	public static final boolean DEBUG_INDEX = Boolean
 			.valueOf(
 					Platform.getDebugOption("org.eclipse.dltk.mod.core/debugIndex")).booleanValue(); //$NON-NLS-1$
@@ -959,8 +951,8 @@ public class DLTKCore extends Plugin {
 											 * variableSourceAttachmentPath,
 											 * variableSourceAttachmentRootPath,
 											 */
-		BuildpathEntry.NO_ACCESS_RULES, BuildpathEntry.NO_EXTRA_ATTRIBUTES,
-				isExported);
+				BuildpathEntry.NO_ACCESS_RULES,
+				BuildpathEntry.NO_EXTRA_ATTRIBUTES, isExported);
 	}
 
 	/**
@@ -975,9 +967,10 @@ public class DLTKCore extends Plugin {
 	 * <p>
 	 * It is possible to register an automatic initializer (
 	 * <code>BuildpathVariableInitializer</code>), which will be invoked through
-	 * the extension point "org.eclipse.dltk.mod.core.buildpathVariableInitializer".
-	 * After resolution, a buildpath variable entry may either correspond to a
-	 * project or a library entry.
+	 * the extension point
+	 * "org.eclipse.dltk.mod.core.buildpathVariableInitializer". After
+	 * resolution, a buildpath variable entry may either correspond to a project
+	 * or a library entry.
 	 * <p>
 	 * e.g. Here are some examples of variable path usage
 	 * <ul>
@@ -1051,10 +1044,9 @@ public class DLTKCore extends Plugin {
 		if (variablePath == null)
 			Assert.isTrue(false, "Variable path cannot be null"); //$NON-NLS-1$
 		if (variablePath.segmentCount() < 1) {
-			Assert
-					.isTrue(
-							false,
-							"Illegal buildpath variable path: \'" + variablePath.makeRelative().toString() + "\', must have at least one segment"); //$NON-NLS-1$//$NON-NLS-2$
+			Assert.isTrue(
+					false,
+					"Illegal buildpath variable path: \'" + variablePath.makeRelative().toString() + "\', must have at least one segment"); //$NON-NLS-1$//$NON-NLS-2$
 		}
 
 		return new BuildpathEntry(IProjectFragment.K_SOURCE,
@@ -1165,7 +1157,8 @@ public class DLTKCore extends Plugin {
 	 * <ul>
 	 * <li>the first segment is a unique ID identifying the target container,
 	 * there must be a container initializer registered onto this ID through the
-	 * extension point "org.eclipse.dltk.mod.core.buildpathContainerInitializer".</li>
+	 * extension point
+	 * "org.eclipse.dltk.mod.core.buildpathContainerInitializer".</li>
 	 * <li>the remaining segments will be passed onto the initializer, and can
 	 * be used as additional hints during the initialization phase.</li>
 	 * </ul>
@@ -1224,10 +1217,9 @@ public class DLTKCore extends Plugin {
 		if (containerPath == null) {
 			Assert.isTrue(false, "Container path cannot be null"); //$NON-NLS-1$
 		} else if (containerPath.segmentCount() < 1) {
-			Assert
-					.isTrue(
-							false,
-							"Illegal buildpath container path: \'" + containerPath.makeRelative().toString() + "\', must have at least one segment (containerID+hints)"); //$NON-NLS-1$//$NON-NLS-2$
+			Assert.isTrue(
+					false,
+					"Illegal buildpath container path: \'" + containerPath.makeRelative().toString() + "\', must have at least one segment (containerID+hints)"); //$NON-NLS-1$//$NON-NLS-2$
 		}
 		BuildpathEntry entry = new BuildpathEntry(IProjectFragment.K_SOURCE,
 				IBuildpathEntry.BPE_CONTAINER, containerPath, isExported,
@@ -1458,10 +1450,10 @@ public class DLTKCore extends Plugin {
 	 * <p>
 	 * Note that buildpath variables can be contributed registered initializers
 	 * for, using the extension point
-	 * "org.eclipse.dltk.mod.core.buildpathVariableInitializer". If an initializer
-	 * is registered for a variable, its persisted value will be ignored: its
-	 * initializer will thus get the opportunity to rebind the variable
-	 * differently on each session.
+	 * "org.eclipse.dltk.mod.core.buildpathVariableInitializer". If an
+	 * initializer is registered for a variable, its persisted value will be
+	 * ignored: its initializer will thus get the opportunity to rebind the
+	 * variable differently on each session.
 	 * 
 	 * @param variableName
 	 *            the name of the buildpath variable
@@ -1579,37 +1571,37 @@ public class DLTKCore extends Plugin {
 
 			case IResource.PROJECT:
 				// internal project
-				return DLTKCore.newProjectEntry(resolvedPath, entry
-						.getAccessRules(), entry.combineAccessRules(), entry
-						.getExtraAttributes(), entry.isExported());
+				return DLTKCore.newProjectEntry(resolvedPath,
+						entry.getAccessRules(), entry.combineAccessRules(),
+						entry.getExtraAttributes(), entry.isExported());
 			case IResource.FILE:
 				// internal binary archive
 				return DLTKCore.newLibraryEntry(resolvedPath,/*
-															 * getResolvedVariablePath(
-															 * entry.
+															 * getResolvedVariablePath
+															 * ( entry.
 															 * getSourceAttachmentPath
 															 * ()),
 															 * getResolvedVariablePath
 															 * (entry.
 															 * getSourceAttachmentRootPath
 															 * ()),
-															 */entry
-						.getAccessRules(), entry.getExtraAttributes(), entry
-						.isExported(), entry.isExternal());
+															 */
+						entry.getAccessRules(), entry.getExtraAttributes(),
+						entry.isExported(), entry.isExternal());
 			case IResource.FOLDER:
 				// internal binary folder
 				return DLTKCore.newLibraryEntry(resolvedPath,/*
-															 * getResolvedVariablePath(
-															 * entry.
+															 * getResolvedVariablePath
+															 * ( entry.
 															 * getSourceAttachmentPath
 															 * ()),
 															 * getResolvedVariablePath
 															 * (entry.
 															 * getSourceAttachmentRootPath
 															 * ()),
-															 */entry
-						.getAccessRules(), entry.getExtraAttributes(), entry
-						.isExported(), entry.isExternal());
+															 */
+						entry.getAccessRules(), entry.getExtraAttributes(),
+						entry.isExported(), entry.isExternal());
 			}
 		}
 		if (target instanceof File) {
@@ -1617,31 +1609,31 @@ public class DLTKCore extends Plugin {
 			if (externalFile != null) {
 				// external binary archive
 				return DLTKCore.newLibraryEntry(resolvedPath,/*
-															 * getResolvedVariablePath(
-															 * entry.
+															 * getResolvedVariablePath
+															 * ( entry.
 															 * getSourceAttachmentPath
 															 * ()),
 															 * getResolvedVariablePath
 															 * (entry.
 															 * getSourceAttachmentRootPath
 															 * ()),
-															 */entry
-						.getAccessRules(), entry.getExtraAttributes(), entry
-						.isExported(), entry.isExternal());
+															 */
+						entry.getAccessRules(), entry.getExtraAttributes(),
+						entry.isExported(), entry.isExternal());
 			} else {
 				// non-existing file
 				if (resolvedPath.isAbsolute()) {
 					return DLTKCore.newLibraryEntry(resolvedPath,/*
-																 * getResolvedVariablePath(
-																 * entry.
+																 * getResolvedVariablePath
+																 * ( entry.
 																 * getSourceAttachmentPath
 																 * ()),
 																 * getResolvedVariablePath
 																 * (entry.
 																 * getSourceAttachmentRootPath
 																 * ()),
-																 */entry
-							.getAccessRules(), entry.getExtraAttributes(),
+																 */
+							entry.getAccessRules(), entry.getExtraAttributes(),
 							entry.isExported(), entry.isExternal());
 				}
 			}
@@ -1737,7 +1729,8 @@ public class DLTKCore extends Plugin {
 	 * Helper method finding the buildpath container initializer registered for
 	 * a given buildpath container ID or <code>null</code> if none was found
 	 * while iterating over the contributions to extension point to the
-	 * extension point "org.eclipse.dltk.mod.core.buildpathContainerInitializer".
+	 * extension point
+	 * "org.eclipse.dltk.mod.core.buildpathContainerInitializer".
 	 * <p>
 	 * A containerID is the first segment of any container path, used to
 	 * identify the registered container initializer.
@@ -1800,16 +1793,15 @@ public class DLTKCore extends Plugin {
 							// executable extension could not be created: ignore
 							// this initializer
 							if (ModelManager.BP_RESOLVE_VERBOSE) {
-								Util
-										.verbose(
-												"BPContainer INIT - failed to instanciate initializer\n" + //$NON-NLS-1$
-														"	container ID: " //$NON-NLS-1$
-														+ containerID
-														+ '\n'
-														+ "	class: " //$NON-NLS-1$
-														+ configElements[j]
-																.getAttribute("class"), //$NON-NLS-1$
-												System.err);
+								Util.verbose(
+										"BPContainer INIT - failed to instanciate initializer\n" + //$NON-NLS-1$
+												"	container ID: " //$NON-NLS-1$
+												+ containerID
+												+ '\n'
+												+ "	class: " //$NON-NLS-1$
+												+ configElements[j]
+														.getAttribute("class"), //$NON-NLS-1$
+										System.err);
 								e.printStackTrace();
 							}
 						}
@@ -1885,65 +1877,56 @@ public class DLTKCore extends Plugin {
 			throws ModelException {
 
 		if (affectedProjects.length != respectiveContainers.length)
-			Assert
-					.isTrue(false,
-							"Projects and containers collections should have the same size"); //$NON-NLS-1$
+			Assert.isTrue(false,
+					"Projects and containers collections should have the same size"); //$NON-NLS-1$
 
 		if (monitor != null && monitor.isCanceled())
 			return;
 
 		if (ModelManager.BP_RESOLVE_VERBOSE) {
-			Util
-					.verbose("BPContainer SET  - setting container\n" + //$NON-NLS-1$
-							"	container path: " //$NON-NLS-1$
-							+ containerPath
-							+ '\n'
-							+ "	projects: {" //$NON-NLS-1$
-							+ org.eclipse.dltk.mod.internal.core.util.Util
-									.toString(
-											affectedProjects,
-											new org.eclipse.dltk.mod.internal.core.util.Util.Displayable() {
-												public String displayString(
-														Object o) {
-													return ((IScriptProject) o)
-															.getElementName();
+			Util.verbose("BPContainer SET  - setting container\n" + //$NON-NLS-1$
+					"	container path: " //$NON-NLS-1$
+					+ containerPath
+					+ '\n'
+					+ "	projects: {" //$NON-NLS-1$
+					+ org.eclipse.dltk.mod.internal.core.util.Util
+							.toString(
+									affectedProjects,
+									new org.eclipse.dltk.mod.internal.core.util.Util.Displayable() {
+										public String displayString(Object o) {
+											return ((IScriptProject) o)
+													.getElementName();
+										}
+									})
+					+ "}\n	values: {\n" + //$NON-NLS-1$
+					org.eclipse.dltk.mod.internal.core.util.Util
+							.toString(
+									respectiveContainers,
+									new org.eclipse.dltk.mod.internal.core.util.Util.Displayable() {
+										public String displayString(Object o) {
+											StringBuffer buffer = new StringBuffer(
+													"		"); //$NON-NLS-1$
+											if (o == null) {
+												buffer.append("<null>"); //$NON-NLS-1$
+												return buffer.toString();
+											}
+											IBuildpathContainer container = (IBuildpathContainer) o;
+											buffer.append(container
+													.getDescription(null));
+											buffer.append(" {\n"); //$NON-NLS-1$
+											IBuildpathEntry[] entries = container
+													.getBuildpathEntries(null);
+											if (entries != null) {
+												for (int i = 0; i < entries.length; i++) {
+													buffer.append(" 			"); //$NON-NLS-1$
+													buffer.append(entries[i]);
+													buffer.append('\n');
 												}
-											})
-							+ "}\n	values: {\n" + //$NON-NLS-1$
-							org.eclipse.dltk.mod.internal.core.util.Util
-									.toString(
-											respectiveContainers,
-											new org.eclipse.dltk.mod.internal.core.util.Util.Displayable() {
-												public String displayString(
-														Object o) {
-													StringBuffer buffer = new StringBuffer(
-															"		"); //$NON-NLS-1$
-													if (o == null) {
-														buffer.append("<null>"); //$NON-NLS-1$
-														return buffer
-																.toString();
-													}
-													IBuildpathContainer container = (IBuildpathContainer) o;
-													buffer
-															.append(container
-																	.getDescription(null));
-													buffer.append(" {\n"); //$NON-NLS-1$
-													IBuildpathEntry[] entries = container
-															.getBuildpathEntries(null);
-													if (entries != null) {
-														for (int i = 0; i < entries.length; i++) {
-															buffer
-																	.append(" 			"); //$NON-NLS-1$
-															buffer
-																	.append(entries[i]);
-															buffer.append('\n');
-														}
-													}
-													buffer.append(" 		}"); //$NON-NLS-1$
-													return buffer.toString();
-												}
-											})
-							+ "\n	}\n	invocation stack trace:"); //$NON-NLS-1$
+											}
+											buffer.append(" 		}"); //$NON-NLS-1$
+											return buffer.toString();
+										}
+									}) + "\n	}\n	invocation stack trace:"); //$NON-NLS-1$
 			new Exception("<Fake exception>").printStackTrace(System.out); //$NON-NLS-1$
 		}
 
@@ -2039,19 +2022,19 @@ public class DLTKCore extends Plugin {
 							continue; // was filtered out
 
 						if (ModelManager.BP_RESOLVE_VERBOSE) {
-							Util
-									.verbose("BPContainer SET  - updating affected project due to setting container\n" + //$NON-NLS-1$
-											"	project: " //$NON-NLS-1$
-											+ affectedProject.getElementName()
-											+ '\n'
-											+ "	container path: " + containerPath); //$NON-NLS-1$
+							Util.verbose("BPContainer SET  - updating affected project due to setting container\n" + //$NON-NLS-1$
+									"	project: " //$NON-NLS-1$
+									+ affectedProject.getElementName()
+									+ '\n'
+									+ "	container path: " + containerPath); //$NON-NLS-1$
 						}
 
 						// force a refresh of the affected project (will compute
 						// deltas)
-						affectedProject.setRawBuildpath(affectedProject
-								.getRawBuildpath(), progressMonitor,
-								canChangeResources, oldResolvedPaths[i], false, // updating
+						affectedProject.setRawBuildpath(
+								affectedProject.getRawBuildpath(),
+								progressMonitor, canChangeResources,
+								oldResolvedPaths[i], false, // updating
 								// -
 								// no
 								// need
@@ -2146,9 +2129,8 @@ public class DLTKCore extends Plugin {
 			IPath[] paths, IProgressMonitor monitor) throws ModelException {
 
 		if (variableNames.length != paths.length)
-			Assert
-					.isTrue(false,
-							"Variable names and paths collections should have the same size"); //$NON-NLS-1$
+			Assert.isTrue(false,
+					"Variable names and paths collections should have the same size"); //$NON-NLS-1$
 		SetVariablesOperation operation = new SetVariablesOperation(
 				variableNames, paths, true/* update preferences */);
 		operation.runOperation(monitor);
@@ -2311,8 +2293,8 @@ public class DLTKCore extends Plugin {
 		if (!path.isAbsolute())
 			Assert.isTrue(false, "Path for IBuildpathEntry must be absolute"); //$NON-NLS-1$
 		return new BuildpathEntry(IProjectFragment.K_BINARY,
-				IBuildpathEntry.BPE_LIBRARY, ScriptProject
-						.canonicalizedPath(path), isExported,
+				IBuildpathEntry.BPE_LIBRARY,
+				ScriptProject.canonicalizedPath(path), isExported,
 				BuildpathEntry.INCLUDE_ALL, // inclusion patterns
 				BuildpathEntry.EXCLUDE_NONE, // exclusion patterns
 				accessRules, false, // no access rules to combine
@@ -2329,8 +2311,8 @@ public class DLTKCore extends Plugin {
 		if (!path.isAbsolute())
 			Assert.isTrue(false, "Path for IBuildpathEntry must be absolute"); //$NON-NLS-1$
 		return new BuildpathEntry(IProjectFragment.K_BINARY,
-				IBuildpathEntry.BPE_LIBRARY, ScriptProject
-						.canonicalizedPath(path), isExported, include, // inclusion
+				IBuildpathEntry.BPE_LIBRARY,
+				ScriptProject.canonicalizedPath(path), isExported, include, // inclusion
 				// patterns
 				exclude, // exclusion patterns
 				accessRules, false, // no access rules to combine
@@ -2444,9 +2426,8 @@ public class DLTKCore extends Plugin {
 
 	public static void error(String message) {
 		plugin.getLog()
-				.log(
-						new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK,
-								message, null));
+				.log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, message,
+						null));
 	}
 
 	public static void error(String message, Throwable t) {

@@ -13,12 +13,13 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- 
+
  *******************************************************************************/
 package org.ebayopensource.vjet.eclipse.core.test.parser;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,8 +33,13 @@ import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.dltk.mod.compiler.env.ISourceModule;
 import org.eclipse.dltk.mod.core.CompletionProposal;
 import org.eclipse.dltk.mod.core.CompletionRequestor;
@@ -46,11 +52,14 @@ import org.eclipse.dltk.mod.core.tests.model.AbstractModelTests;
 import org.eclipse.dltk.mod.internal.core.JSSourceField;
 import org.eclipse.dltk.mod.internal.core.JSSourceFieldElementInfo;
 import org.eclipse.dltk.mod.ui.templates.ScriptTemplateProposal;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.progress.IProgressService;
 
 import org.ebayopensource.dsf.jst.IJstType;
 import org.ebayopensource.dsf.ts.event.EventListenerStatus;
@@ -60,43 +69,45 @@ import org.ebayopensource.vjet.eclipse.core.IJSField;
 import org.ebayopensource.vjet.eclipse.core.IJSMethod;
 import org.ebayopensource.vjet.eclipse.core.IJSSourceModule;
 import org.ebayopensource.vjet.eclipse.core.search.matching.ICategoryRequestor;
+import org.ebayopensource.vjet.eclipse.core.test.FixtureUtils;
 import org.ebayopensource.vjet.eclipse.core.test.VjetModelTestsPlugin;
 import org.ebayopensource.vjo.tool.typespace.TypeSpaceMgr;
 
-public abstract class AbstractVjoModelTests extends AbstractModelTests implements ISourceEventCallback<IJstType> {
-		
+public abstract class AbstractVjoModelTests extends AbstractModelTests
+		implements ISourceEventCallback<IJstType> {
+
 	protected static final String PROJECT_NAME = "TestProject";
-	
+
 	protected static final String VJO_EDITOR = "org.ebayopensource.vjet.ui.VjetJsEditor";
 
 	private String workspaceSufix = "";
 
 	protected TypeSpaceMgr mgr = TypeSpaceMgr.getInstance();
 
-	private boolean isFinished;	
+	private boolean isFinished;
 
 	public AbstractVjoModelTests() {
 		super(VjetModelTestsPlugin.PLUGIN_NAME, null);
 	}
 
 	public AbstractVjoModelTests(String name) {
-		super(VjetModelTestsPlugin.PLUGIN_NAME, name);		
+		super(VjetModelTestsPlugin.PLUGIN_NAME, name);
 	}
 
-	public void setUpSuite() {		
+	public void setUpSuite() {
 		mgr.setAllowChanges(false);
 		try {
 			super.setUpSuite();
 			IScriptProject proj = setUpScriptProjectTo(getTestProjectName(),
-					PROJECT_NAME);					
-			mgr.reload(this);			
+					PROJECT_NAME);
+			mgr.reload(this);
 			waitTypeSpaceLoaded();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		System.out.println("AbstractVjoModelTests.setUpSuite()");
 	}
-	
+
 	public void tearDownSuite() throws Exception {
 		deleteProject(getTestProjectName());
 		mgr.clean();
@@ -108,30 +119,32 @@ public abstract class AbstractVjoModelTests extends AbstractModelTests implement
 	}
 
 	protected IEditorPart getEditor(IJSSourceModule module) {
-		IWorkbench workbench= PlatformUI.getWorkbench();
+		IWorkbench workbench = PlatformUI.getWorkbench();
 		Workspace m_workspace = (Workspace) ResourcesPlugin.getWorkspace();
-		 //workbench = PlatformUI.getWorlbench()
-		IPath path = module.getPath(); //new Path("VJETProject").append("selection").append("A");		
-		IFile file = (IFile) m_workspace.newResource(path,IResource.FILE);
+		// workbench = PlatformUI.getWorlbench()
+		IPath path = module.getPath(); // new
+										// Path("VJETProject").append("selection").append("A");
+		IFile file = (IFile) m_workspace.newResource(path, IResource.FILE);
 		FileEditorInput input = new FileEditorInput(file);
 		IEditorPart editor = null;
 		try {
-			editor = workbench.getActiveWorkbenchWindow().getActivePage().openEditor(input,
-					VJO_EDITOR,true);
+			editor = workbench.getActiveWorkbenchWindow().getActivePage()
+					.openEditor(input, VJO_EDITOR, true);
 		} catch (PartInitException e) {
-			assertFalse("Can't open editor for " + module.getElementName(), true);
+			assertFalse("Can't open editor for " + module.getElementName(),
+					true);
 		}
-		
+
 		return editor;
 	}
-	
+
 	protected static IJSField processField(IField[] fields, String fieldName,
 			String expectedType, int expectedModifiers) throws ModelException {
 		List<IJSField> foundFields = findFieldByName(fields, fieldName);
 		assertEquals("Wrong number of fields found", 1, foundFields.size());
 		IJSField field = foundFields.get(0);
-		assertEquals("Wrong field modifiers", expectedModifiers, field
-				.getFlags());
+		assertEquals("Wrong field modifiers", expectedModifiers,
+				field.getFlags());
 		JSSourceField sourceField = (JSSourceField) field;
 		JSSourceFieldElementInfo fieldInfo = (JSSourceFieldElementInfo) sourceField
 				.getElementInfo();
@@ -154,10 +167,10 @@ public abstract class AbstractVjoModelTests extends AbstractModelTests implement
 			String expectedReturnType, int expectedModifiers)
 			throws ModelException {
 		IJSMethod method = findMethodByName(methods, methodName);
-		assertEquals("Wrong method modifiers", expectedModifiers, method
-				.getFlags());
-		assertEquals("Wrong return type", expectedReturnType, method
-				.getReturnType());
+		assertEquals("Wrong method modifiers", expectedModifiers,
+				method.getFlags());
+		assertEquals("Wrong return type", expectedReturnType,
+				method.getReturnType());
 
 		return method;
 	}
@@ -224,7 +237,7 @@ public abstract class AbstractVjoModelTests extends AbstractModelTests implement
 		return engine;
 	}
 
-	protected int firstPositionInFile(String string,IJSSourceModule module)
+	protected int firstPositionInFile(String string, IJSSourceModule module)
 			throws ModelException {
 		String content = module.getSource();
 
@@ -249,8 +262,8 @@ public abstract class AbstractVjoModelTests extends AbstractModelTests implement
 
 		return -1;
 	}
-	
-	public int firstBeforePositionInFile(String string, IJSSourceModule module) 
+
+	public int firstBeforePositionInFile(String string, IJSSourceModule module)
 			throws ModelException {
 		String content = module.getSource();
 
@@ -260,11 +273,11 @@ public abstract class AbstractVjoModelTests extends AbstractModelTests implement
 		}
 		return -1;
 	}
-	
-	public int lastBeforePositionInFile(String string, IJSSourceModule module) 
+
+	public int lastBeforePositionInFile(String string, IJSSourceModule module)
 			throws ModelException {
 		String content = module.getSource();
-		
+
 		if (string == null)
 			return content.length();
 
@@ -278,7 +291,7 @@ public abstract class AbstractVjoModelTests extends AbstractModelTests implement
 
 	protected void compareCompletions(LinkedList<CompletionProposal> results,
 			String[] names, boolean compareOnlyNames) {
-		assertEquals("Results :"+results,names.length, results.size());
+		assertEquals("Results :" + results, names.length, results.size());
 		Collections.sort(results, new Comparator() {
 
 			public int compare(Object arg0, Object arg1) {
@@ -307,9 +320,10 @@ public abstract class AbstractVjoModelTests extends AbstractModelTests implement
 		}
 	}
 
-	protected void compareTemplateCompletions(List<ScriptTemplateProposal> results,
-			String[] names, boolean compareOnlyNames) {
-		assertEquals("Results :"+results,names.length, results.size());
+	protected void compareTemplateCompletions(
+			List<ScriptTemplateProposal> results, String[] names,
+			boolean compareOnlyNames) {
+		assertEquals("Results :" + results, names.length, results.size());
 		Collections.sort(results, new Comparator() {
 
 			public int compare(Object arg0, Object arg1) {
@@ -320,10 +334,11 @@ public abstract class AbstractVjoModelTests extends AbstractModelTests implement
 			}
 
 		});
-		//Jack: if here sorting the list, test method will not be sure which is the right sequence 
-//		if (names.length > 1) {
-//			Arrays.sort(names, 0, names.length);
-//		}
+		// Jack: if here sorting the list, test method will not be sure which is
+		// the right sequence
+		// if (names.length > 1) {
+		// Arrays.sort(names, 0, names.length);
+		// }
 		Iterator it = results.iterator();
 		int pos = 0;
 		// System.out.println(results.toString());
@@ -337,9 +352,9 @@ public abstract class AbstractVjoModelTests extends AbstractModelTests implement
 			pos++;
 		}
 	}
-	
-	protected void basicTest(IJSSourceModule module, int position, String[] compNames,
-			String category) throws ModelException {
+
+	protected void basicTest(IJSSourceModule module, int position,
+			String[] compNames, String category) throws ModelException {
 		assertNotSame("Invalid file content, cant find position", -1, position);
 
 		LinkedList<CompletionProposal> results = new LinkedList<CompletionProposal>();
@@ -359,7 +374,7 @@ public abstract class AbstractVjoModelTests extends AbstractModelTests implement
 		c.complete((ISourceModule) module, position, 0);
 		containsNames(results, compNames);
 	}
-	
+
 	protected void excludesNames(IJSSourceModule module, int position,
 			String[] compNames, String category) throws ModelException {
 		assertNotSame("Invalid file content, cant find position", -1, position);
@@ -384,12 +399,12 @@ public abstract class AbstractVjoModelTests extends AbstractModelTests implement
 		}
 
 		for (String string : names) {
-			assertTrue("Results not contains " + string + " proposal in list"+resultNames,
-					resultNames.contains(string));
+			assertTrue("Results not contains " + string + " proposal in list"
+					+ resultNames, resultNames.contains(string));
 		}
 
 	}
-	
+
 	protected void excludesNames(LinkedList<CompletionProposal> results,
 			String[] names) {
 		List<String> resultNames = new ArrayList<String>();
@@ -399,93 +414,99 @@ public abstract class AbstractVjoModelTests extends AbstractModelTests implement
 		}
 
 		for (String string : names) {
-			assertFalse("Results not contains " + string + " proposal in list"+resultNames,
-					resultNames.contains(string));
+			assertFalse("Results not contains " + string + " proposal in list"
+					+ resultNames, resultNames.contains(string));
 		}
 
 	}
 
 	public void waitTypeSpaceLoaded() {
-		while (!TypeSpaceMgr.getInstance().isLoaded()) {
-			try {
-				Thread.sleep(300);
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-		}		
+		buildAndWaitForEnd();
 	}
 
+	public static boolean buildAndWaitForEnd() {
+		return FixtureUtils.buildAndWaitForEnd();
+	}
+
+	public static boolean incrementalBuildAndWaitForEnd() {
+		return FixtureUtils.incrementalBuildAndWaitForEnd();
+	}
 
 	public void onComplete(EventListenerStatus<IJstType> arg0) {
-		isFinished = true;	
+		isFinished = true;
 	}
-	
+
 	public void onProgress(float percent) {
-//		System.out.println("Percentage of completion " + percent);
+		// System.out.println("Percentage of completion " + percent);
 	}
 
 	protected boolean isJSFile(String file) {
 		return file.endsWith(".js");
 	}
-	
+
 	/** Start : code for not running the failing test cases **/
 	private List<String> testCaseFormats = new ArrayList<String>();
-	
+
 	private final void addTestCaseFormats(final String testName) {
 		if (!testCaseFormats.contains(testName))
 			testCaseFormats.add(testName);
-    }
-	
-    private static List<String> ExcludeIt = new ArrayList<String>();
-    static {
-    	Properties p = new Properties();
-    	String file = "/VJETJunitFailingTests.properties";
-    	try {
+	}
+
+	private static List<String> ExcludeIt = new ArrayList<String>();
+	static {
+		Properties p = new Properties();
+		String file = "/VJETJunitFailingTests.properties";
+		try {
 			p.load(AbstractVjoModelTests.class.getResourceAsStream(file));
 			ExcludeIt = Arrays.asList(p.getProperty("excludeTests").split(","));
-//			Platform.addLogListener(new LogListener());
+			// Platform.addLogListener(new LogListener());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    }
-	
+	}
+
 	@Override
 	public void runBare() throws Throwable {
 		populateTestCaseFormat();
-        
-        //Check if we need to run the test case
-        boolean runTest = true;
-        Iterator<String> iter = testCaseFormats.iterator();
-        while (runTest && iter.hasNext()){
-        	runTest = !ExcludeIt.contains(iter.next());
-        }
-        
-        //when in pde build and test, we need this information to know where we've reached
-        System.err.println("Start running test case '" + getName() + "' in Class '" + getClass().getName());
-       
-        if (runTest) {
-            super.runBare();
-        } else {
-        	System.err.println("Test case '" + getName() + "' in Class '" + getClass().getName()
-        			+ "' is failing and hence it is not being run. Please fix the test case.");
-        }
-	}
-	
-	private void populateTestCaseFormat(){
-		String className = getClass().getName();
-        String testName = getName();
-        if (testName != null) {
-        	addTestCaseFormats(className + "." + testName);
-        }
 
-        int dot = className.lastIndexOf('.');
-        if (dot >= 0) {
-            String localName = className.substring(dot + 1);
-            if (testName != null) {
-            	addTestCaseFormats(localName + "." + testName);
-            }
-        }
+		// Check if we need to run the test case
+		boolean runTest = true;
+		Iterator<String> iter = testCaseFormats.iterator();
+		while (runTest && iter.hasNext()) {
+			runTest = !ExcludeIt.contains(iter.next());
+		}
+
+		// when in pde build and test, we need this information to know where
+		// we've reached
+		System.err.println("Start running test case '" + getName()
+				+ "' in Class '" + getClass().getName());
+
+		if (runTest) {
+			super.runBare();
+		} else {
+			System.err
+					.println("Test case '"
+							+ getName()
+							+ "' in Class '"
+							+ getClass().getName()
+							+ "' is failing and hence it is not being run. Please fix the test case.");
+		}
 	}
-    /** End : code for not running the failing test cases **/
+
+	private void populateTestCaseFormat() {
+		String className = getClass().getName();
+		String testName = getName();
+		if (testName != null) {
+			addTestCaseFormats(className + "." + testName);
+		}
+
+		int dot = className.lastIndexOf('.');
+		if (dot >= 0) {
+			String localName = className.substring(dot + 1);
+			if (testName != null) {
+				addTestCaseFormats(localName + "." + testName);
+			}
+		}
+	}
+	/** End : code for not running the failing test cases **/
 }

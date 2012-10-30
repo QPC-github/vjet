@@ -129,7 +129,7 @@ public class VjoMarkOccurencesNewTests extends AbstractMarkOccurencesTests {
 	private void simplyTest(String occurrenceName, String excludedName, String sentence)throws ModelException  {
 		String js = "selection/MyTest.js";
 		FixtureManager m_fixtureManager = FixtureUtils.setUpFixture(this, js);
-		
+		buildAndWaitForEnd();
 		try {
 			IJSSourceModule module = (IJSSourceModule) getSourceModule(
 					getProjectName(), "src", new Path(js));

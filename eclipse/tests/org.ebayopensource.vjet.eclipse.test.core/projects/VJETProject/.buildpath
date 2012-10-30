@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <buildpath>
 	<buildpathentry kind="src" path="src"/>
-	<buildpathentry exported="true" kind="con" path="org.eclipse.dltk.launching.INTERPRETER_CONTAINER"/>
-	<buildpathentry kind="con" path="org.ebayopensource.vjet.eclipse.core.SDK_CONTAINER/DEFUALT_SDK"/>
+	<buildpathentry kind="con" path="org.eclipse.dltk.mod.launching.INTERPRETER_CONTAINER"/>
+	<buildpathentry kind="con" path="org.ebayopensource.vjet.eclipse.core.JSNATIVE_CONTAINER/JS Native Types"/>
+	<buildpathentry kind="con" path="org.ebayopensource.vjet.eclipse.core.BROWSER_CONTAINER/Browser SDK"/>
+	<buildpathentry kind="con" path="org.ebayopensource.vjet.eclipse.core.VJO_CONTAINER/VJO LIB"/>
+	
 </buildpath>

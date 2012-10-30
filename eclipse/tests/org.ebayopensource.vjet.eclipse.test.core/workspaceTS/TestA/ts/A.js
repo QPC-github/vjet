@@ -1,4 +1,4 @@
-vjo.type("ts.A").protos({
+vjo.ctype("ts.A").protos({
 
   //> private ts.B b
   b : 5,
@@ -8,4 +8,5 @@ vjo.type("ts.A").protos({
   	
   }
  
-});
+})
+.endType();

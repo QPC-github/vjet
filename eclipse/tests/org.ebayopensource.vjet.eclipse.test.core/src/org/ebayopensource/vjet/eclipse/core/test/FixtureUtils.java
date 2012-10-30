@@ -8,6 +8,8 @@
  *******************************************************************************/
 package org.ebayopensource.vjet.eclipse.core.test;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.ebayopensource.dsf.ts.event.EventListenerStatus;
 import org.ebayopensource.dsf.ts.event.ISourceEventCallback;
 import org.ebayopensource.dsf.ts.type.TypeName;
@@ -15,6 +17,17 @@ import org.ebayopensource.vjet.eclipse.core.test.contentassist.TestConstants;
 import org.ebayopensource.vjet.eclipse.core.test.parser.AbstractVjoModelTests;
 import org.ebayopensource.vjet.testframework.fixture.FixtureManager;
 import org.ebayopensource.vjo.tool.typespace.TypeSpaceMgr;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.Workbench;
+import org.eclipse.ui.progress.IProgressService;
 
 public class FixtureUtils {
 		
@@ -55,6 +68,10 @@ public class FixtureUtils {
 		TypeSpaceMgr.getInstance().setAllowChanges(false);
 		FixtureManager m_fixtureManager  = new FixtureManager(test);
 		m_fixtureManager.setUp(TestConstants.FIXTURE_ID_VJETPROJECT);
+		
+		// build here
+		
+		
 		TypeName typeName = 
 			new TypeName(TestConstants.PROJECT_NAME_VJETPROJECT, getJsName(js));
 		if (TypeSpaceMgr.getInstance().existType(typeName)){
@@ -66,15 +83,83 @@ public class FixtureUtils {
 		return m_fixtureManager;
 	}
 
+	  public static boolean buildAndWaitForEnd() { 
+	         IProgressService progressService = Workbench.getInstance().getProgressService(); 
+	         final IRunnableWithProgress runnable = new 
+	IRunnableWithProgress() { 
+	             public void run(IProgressMonitor monitor) throws 
+	InvocationTargetException { 
+	             IJobManager jobManager = Job.getJobManager(); 
+	             IWorkbench workbench = PlatformUI.getWorkbench(); 
+	                 try { 
+	  
+	ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.FULL_BUILD, 
+	monitor); 
+	                 } catch (CoreException e) { 
+	                     throw new InvocationTargetException(e); 
+	                 } 
+	                 if (!monitor.isCanceled()) { 
+	                     try { 
+	  
+	jobManager.join(ResourcesPlugin.FAMILY_MANUAL_BUILD, monitor); 
+	  
+	jobManager.join(ResourcesPlugin.FAMILY_AUTO_BUILD, monitor); 
+	                     } catch (InterruptedException e) { 
+	                         // continue 
+	                     } 
+	                 } 
+	             } 
+	         }; 
+	         try { 
+	             progressService.busyCursorWhile(runnable); 
+	             return true; 
+	         } catch(Exception e){
+	        	 
+	         }
+	         
+	         return false; 
+	     } 
+	  
+	  public static boolean incrementalBuildAndWaitForEnd() { 
+	         IProgressService progressService = Workbench.getInstance().getProgressService(); 
+	         final IRunnableWithProgress runnable = new 
+	IRunnableWithProgress() { 
+	             public void run(IProgressMonitor monitor) throws 
+	InvocationTargetException { 
+	             IJobManager jobManager = Job.getJobManager(); 
+	             IWorkbench workbench = PlatformUI.getWorkbench(); 
+	                 try { 
+	  
+	ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.INCREMENTAL_BUILD, 
+	monitor); 
+	                 } catch (CoreException e) { 
+	                     throw new InvocationTargetException(e); 
+	                 } 
+	                 if (!monitor.isCanceled()) { 
+	                     try { 
+	  
+	jobManager.join(ResourcesPlugin.FAMILY_MANUAL_BUILD, monitor); 
+	  
+	jobManager.join(ResourcesPlugin.FAMILY_AUTO_BUILD, monitor); 
+	                     } catch (InterruptedException e) { 
+	                         // continue 
+	                     } 
+	                 } 
+	             } 
+	         }; 
+	         try { 
+	             progressService.busyCursorWhile(runnable); 
+	             return true; 
+	         } catch(Exception e){
+	        	 
+	         }
+	         
+	         return false; 
+	     } 
+
+	
 	private static void waitForComplete() {
-		while (!TypeSpaceMgr.getInstance().isLoaded()){
-			try {
-				Thread.sleep(100);
-			}
-			catch (Exception e) {
-				
-			}
-		}
+		buildAndWaitForEnd();
 		
 	}
 

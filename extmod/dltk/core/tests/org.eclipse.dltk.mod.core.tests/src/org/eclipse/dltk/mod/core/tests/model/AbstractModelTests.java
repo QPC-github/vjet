@@ -31,6 +31,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
@@ -437,6 +438,7 @@ public abstract class AbstractModelTests extends SuiteOfTestCases {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				project.create(null);
 				project.open(null);
+				project.build(IncrementalProjectBuilder.FULL_BUILD,null);
 			}
 		};
 		getWorkspace().run(create, null);

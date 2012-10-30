@@ -110,7 +110,7 @@ public class AbstractVjoAutoEditorStrategyTester extends AbstractVjoModelTests {
 		+ module.getSource().substring(cmd.offset + cmd.length);
 
 		try {
-			assertEquals(newOutput, goldenModule.getSource());
+			assertEquals(goldenModule.getSource(), newOutput );
 		} finally {
 			try {
 				Thread.sleep(5);

@@ -28,6 +28,42 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.apache.tools.ant.util.FileUtils;
+import org.ebayopensource.dsf.jst.IJstMethod;
+import org.ebayopensource.dsf.jst.IJstNode;
+import org.ebayopensource.dsf.jst.IJstProperty;
+import org.ebayopensource.dsf.jst.IJstType;
+import org.ebayopensource.dsf.jst.IScriptUnit;
+import org.ebayopensource.dsf.jst.declaration.JstProxyMethod;
+import org.ebayopensource.dsf.jst.declaration.JstProxyProperty;
+import org.ebayopensource.dsf.jst.declaration.JstTypeReference;
+import org.ebayopensource.dsf.jst.term.JstIdentifier;
+import org.ebayopensource.dsf.jstojava.translator.JstUtil;
+import org.ebayopensource.dsf.ts.type.TypeName;
+import org.ebayopensource.vjet.eclipse.codeassist.CodeassistUtils;
+import org.ebayopensource.vjet.eclipse.core.IImportContainer;
+import org.ebayopensource.vjet.eclipse.core.IJSSourceModule;
+import org.ebayopensource.vjet.eclipse.core.IJSType;
+import org.ebayopensource.vjet.eclipse.core.VjoNature;
+import org.ebayopensource.vjet.eclipse.core.parser.VjoParserToJstAndIType;
+import org.ebayopensource.vjet.eclipse.core.search.SearchQueryParameters;
+import org.ebayopensource.vjet.eclipse.core.search.VjoSearchEngine;
+import org.ebayopensource.vjet.eclipse.core.test.parser.AbstractVjoModelTests;
+import org.ebayopensource.vjet.eclipse.core.ts.EclipseTypeLoadMonitor;
+import org.ebayopensource.vjet.eclipse.internal.parser.VjoSourceParser;
+import org.ebayopensource.vjet.eclipse.internal.ui.actions.AddVjoNatureAction;
+import org.ebayopensource.vjet.eclipse.internal.ui.actions.VjoValidationAction;
+import org.ebayopensource.vjet.eclipse.internal.ui.dialogs.VjoTypeInfoViewer;
+import org.ebayopensource.vjet.eclipse.internal.ui.editor.VjoEditor;
+import org.ebayopensource.vjet.eclipse.internal.ui.editor.VjoOutlinePage;
+import org.ebayopensource.vjet.eclipse.internal.ui.text.VjetColorConstants;
+import org.ebayopensource.vjet.eclipse.internal.ui.text.folding.VjoFoldingStructureProvider;
+import org.ebayopensource.vjet.eclipse.ui.VjetPreferenceConstants;
+import org.ebayopensource.vjet.eclipse.ui.VjetUIPlugin;
+import org.ebayopensource.vjet.eclipse.ui.actions.nature.AddVjoNaturePolicyManager;
+import org.ebayopensource.vjet.eclipse.ui.actions.nature.IAddVjoNaturePolicy;
+import org.ebayopensource.vjet.testframework.view.EditorUtil;
+import org.ebayopensource.vjet.testframework.view.SyntaxHighlightUtil;
+import org.ebayopensource.vjo.tool.typespace.TypeSpaceMgr;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -116,44 +152,8 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.junit.Ignore;
 import org.osgi.framework.Bundle;
-
-import org.ebayopensource.dsf.jst.IJstMethod;
-import org.ebayopensource.dsf.jst.IJstNode;
-import org.ebayopensource.dsf.jst.IJstProperty;
-import org.ebayopensource.dsf.jst.IJstType;
-import org.ebayopensource.dsf.jst.IScriptUnit;
-import org.ebayopensource.dsf.jst.declaration.JstProxyMethod;
-import org.ebayopensource.dsf.jst.declaration.JstProxyProperty;
-import org.ebayopensource.dsf.jst.declaration.JstTypeReference;
-import org.ebayopensource.dsf.jst.term.JstIdentifier;
-import org.ebayopensource.dsf.jstojava.translator.JstUtil;
-import org.ebayopensource.dsf.ts.type.TypeName;
-import org.ebayopensource.vjet.eclipse.codeassist.CodeassistUtils;
-import org.ebayopensource.vjet.eclipse.core.IImportContainer;
-import org.ebayopensource.vjet.eclipse.core.IJSSourceModule;
-import org.ebayopensource.vjet.eclipse.core.IJSType;
-import org.ebayopensource.vjet.eclipse.core.VjoNature;
-import org.ebayopensource.vjet.eclipse.core.parser.VjoParserToJstAndIType;
-import org.ebayopensource.vjet.eclipse.core.search.SearchQueryParameters;
-import org.ebayopensource.vjet.eclipse.core.search.VjoSearchEngine;
-import org.ebayopensource.vjet.eclipse.core.test.parser.AbstractVjoModelTests;
-import org.ebayopensource.vjet.eclipse.core.ts.EclipseTypeLoadMonitor;
-import org.ebayopensource.vjet.eclipse.internal.parser.VjoSourceParser;
-import org.ebayopensource.vjet.eclipse.internal.ui.actions.AddVjoNatureAction;
-import org.ebayopensource.vjet.eclipse.internal.ui.actions.VjoValidationAction;
-import org.ebayopensource.vjet.eclipse.internal.ui.dialogs.VjoTypeInfoViewer;
-import org.ebayopensource.vjet.eclipse.internal.ui.editor.VjoEditor;
-import org.ebayopensource.vjet.eclipse.internal.ui.editor.VjoOutlinePage;
-import org.ebayopensource.vjet.eclipse.internal.ui.text.VjetColorConstants;
-import org.ebayopensource.vjet.eclipse.internal.ui.text.folding.VjoFoldingStructureProvider;
-import org.ebayopensource.vjet.eclipse.ui.VjetPreferenceConstants;
-import org.ebayopensource.vjet.eclipse.ui.VjetUIPlugin;
-import org.ebayopensource.vjet.eclipse.ui.actions.nature.AddVjoNaturePolicyManager;
-import org.ebayopensource.vjet.eclipse.ui.actions.nature.IAddVjoNaturePolicy;
-import org.ebayopensource.vjet.testframework.view.EditorUtil;
-import org.ebayopensource.vjet.testframework.view.SyntaxHighlightUtil;
-import org.ebayopensource.vjo.tool.typespace.TypeSpaceMgr;
 
 /**
  * verify bugs that window tester can not handle
@@ -218,7 +218,8 @@ public class BugVerifyTests extends AbstractVjoModelTests {
 	 *  
 	 * @throws Exception
 	 */
-	public void test1511() throws Exception {
+	@Ignore("todo reenable vjo color syntax highlighting")
+	public void ignoretest1511() throws Exception {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME);
 		IFile file = project.getFile("src/Bug1511.js");
 		IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), file);
@@ -983,7 +984,7 @@ public class BugVerifyTests extends AbstractVjoModelTests {
 			}
 			
 			//verify dltk todo annotation number
-			assertTrue("should be TWO todo markers", count == 2);
+			assertEquals("should be TWO todo markers",  2, count);
 		}
 		finally {
 			workbenchPage.closeEditor(vjoEditor, false);

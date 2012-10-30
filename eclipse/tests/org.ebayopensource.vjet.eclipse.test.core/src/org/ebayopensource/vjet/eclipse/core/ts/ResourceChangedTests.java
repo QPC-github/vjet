@@ -53,12 +53,12 @@ public class ResourceChangedTests extends AbstractVjoModelTests {
 			IProject iProj = getProject(getTestProjectName());
 			//IProject iProj = setUpProjectTo("TestProject", "TestProject");
 			//sleep to wait for the group to be loaded into type space
-			Thread.sleep(2000);
-			
+			 buildAndWaitForEnd();
 			
 			TypeName typeName = new TypeName(getTestProjectName(), "test.TestImps");
 			//check if the type exists in type space before the deletion
 			IJstType removedType = TypeSpaceMgr.getInstance().findType(typeName);
+		
 			assertTrue(removedType != null);
 			
 			//change the resource
@@ -68,7 +68,7 @@ public class ResourceChangedTests extends AbstractVjoModelTests {
 			ResourceChangeOperationHandler operationHandler =  OPERATION_REGISTRY.get(operation);
 			operationHandler.change(resource);
 			//sleep to wait for the deletion from type space to complete @see JstEventListener#onTypeRemoved()
-			Thread.sleep(2000);
+		   incrementalBuildAndWaitForEnd();
 			
 			
 			//check if the type is removed from type space after the deletion

@@ -4,10 +4,10 @@ vjo.needs("ts.I");
 vjo.type("ts.B").inherits("ts.A").satisfies("ts.I").protos({
 
  
- //>private  void hju()
+ //>private void hju()
  hju : function() {
  
    this.base.gh();	
  }
  
-});
+}).endType();

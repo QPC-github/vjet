@@ -4,7 +4,7 @@
 	<comment></comment>
 	<projects>
 	</projects>
-		<buildSpec>
+	<buildSpec>
 		<buildCommand>
 		    <name>org.ebayopensource.vjet.eclipse.core.builder</name>
 			<arguments>

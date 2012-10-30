@@ -9,14 +9,24 @@
 package org.ebayopensource.vjet.eclipse.core.test.parser;
 
 import java.io.IOException;
-
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.dltk.mod.core.ModelException;
+import java.lang.reflect.InvocationTargetException;
 
 import org.ebayopensource.vjet.eclipse.core.IJSSourceModule;
 import org.ebayopensource.vjet.eclipse.core.search.matching.ICategoryRequestor;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.dltk.mod.core.ModelException;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.Workbench;
+import org.eclipse.ui.progress.IProgressService;
 
 public class VjoSelectionRefPrjsTests extends AbstractSelectionModelTests {
 	
@@ -26,7 +36,7 @@ public class VjoSelectionRefPrjsTests extends AbstractSelectionModelTests {
 	
 	private static boolean isFirstRun = true;
 		
-	public void setUp() throws IOException {
+	public void setUp() throws IOException, CoreException {
 		setWorkspaceSufix("3");
 		IProject project1 = getWorkspaceRoot().getProject(PROJECT1_NAME);
 		IProject project2 = getWorkspaceRoot().getProject(PROJECT2_NAME);
@@ -39,11 +49,14 @@ public class VjoSelectionRefPrjsTests extends AbstractSelectionModelTests {
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
-			isFirstRun = false;
-			mgr.reload(this);
-			waitTypeSpaceLoaded();
+			buildAndWaitForEnd();
+			
 		}
 	}
+	
+	
+	
+	
 		
 	private void copyProjects(String... names) throws CoreException,
 		IOException {
@@ -61,6 +74,7 @@ public class VjoSelectionRefPrjsTests extends AbstractSelectionModelTests {
 		String[] names = new String[] { "B" };
 		IJSSourceModule module = (IJSSourceModule) getSourceModule(
 				PROJECT2_NAME, "src", new Path("fld2/D.js"));
+		System.out.println(module);
 		int position = firstPositionInFile("B", module);
 		
 		basicTest(module, position, names, ICategoryRequestor.TYPE_CATEGORY);

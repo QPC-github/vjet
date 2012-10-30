@@ -39,17 +39,15 @@ public class ExpressionTypeLinkerTests extends AbstractVjoModelTests {
 	 @Before
 	public void setUp() {
 		setWorkspaceSufix("1");
-		IProject project = getWorkspaceRoot().getProject(getTestProjectName());
+//		IProject project = getWorkspaceRoot().getProject(getTestProjectName());
 
-		if (isFirstRun) {
-			try {
-				super.deleteResource(project);
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				super.deleteResource(project);
+//			} catch (CoreException e) {
+//				e.printStackTrace();
+//			}
 			super.setUpSuite();			
-			isFirstRun = false;
-		}
+		
 		TypeName tn = new TypeName(getTestProjectName(), "ETLinkerB.LinkerB");
 		linkerB = mgr.findType(tn);
 		tn = new TypeName(getTestProjectName(), "ETLinkerA.LinkerA");
@@ -84,13 +82,18 @@ public class ExpressionTypeLinkerTests extends AbstractVjoModelTests {
 	
 	public void testThisBaseField() {		
 		//mgr.reload(null);
-		IJstProperty s = this.linkerA.getProperty("s", false);
-		IJstMethod func = this.linkerB.getInstanceMethod("func");
+		TypeName tn = new TypeName(getTestProjectName(), "ETLinkerB.LinkerB");
+		IJstType linkerB = mgr.findType(tn);
+		tn = new TypeName(getTestProjectName(), "ETLinkerA.LinkerA");
+		IJstType linkerA = mgr.findType(tn);
+		
+		IJstProperty s = linkerA.getProperty("s", false);
+		IJstMethod func = linkerB.getInstanceMethod("func");
 		List<BaseJstNode> children = func.getBlock().getChildren();
 		
 		ExprStmt expr = (ExprStmt) children.get(3);
 		FieldAccessExpr baseS = (FieldAccessExpr) expr.getChildren().get(0);		
-		assertEquals(s, baseS.getName().getJstBinding());
+		assertEquals(s.getParentNode(), baseS.getName().getJstBinding().getParentNode());
 	}
 	
 	public void testThisBaseMethod() {
@@ -99,7 +102,7 @@ public class ExpressionTypeLinkerTests extends AbstractVjoModelTests {
 		List<BaseJstNode> children = func.getBlock().getChildren();
 		MtdInvocationExpr baseFunc = (MtdInvocationExpr) children.get(4);
 		IJstNode binding = ((JstIdentifier) baseFunc.getMethodIdentifier()).getJstBinding();
-		assertEquals(funcA, binding);
+		assertEquals(funcA.getParentNode(), binding.getParentNode());
 	}
 	
 	public void testMethodReturnType() {
@@ -108,7 +111,7 @@ public class ExpressionTypeLinkerTests extends AbstractVjoModelTests {
 		List<BaseJstNode> children = func.getBlock().getChildren();
 		ExprStmt expr = (ExprStmt) children.get(5);
 		FieldAccessExpr cc = (FieldAccessExpr) expr.getChildren().get(0);
-		assertEquals(c, cc.getName().getJstBinding());
+		assertEquals(c.getParentNode(), cc.getName().getJstBinding().getParentNode());
 	}
 	
 	public void testFieldType() {
@@ -118,7 +121,7 @@ public class ExpressionTypeLinkerTests extends AbstractVjoModelTests {
 		
 		ExprStmt expr = (ExprStmt) children.get(5);
 		FieldAccessExpr fc = (FieldAccessExpr) expr.getChildren().get(0);		
-		assertEquals(c, fc.getName().getJstBinding());
+		assertEquals(c.getParentNode(), fc.getName().getJstBinding().getParentNode());
 	}
 	
 
