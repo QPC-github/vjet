@@ -12,6 +12,8 @@ import org.ebayopensource.dsf.jsnative.anno.Function;
 import org.ebayopensource.dsf.jsnative.anno.JsMetatype;
 import org.ebayopensource.dsf.jsnative.anno.JsSupport;
 import org.ebayopensource.dsf.jsnative.anno.JsVersion;
+import org.ebayopensource.dsf.jsnative.anno.JstMultiReturn;
+import org.ebayopensource.dsf.jsnative.anno.OverLoadFunc;
 import org.ebayopensource.dsf.jsnative.anno.Property;
 import org.mozilla.mod.javascript.IWillBeScriptable;
 
@@ -129,8 +131,12 @@ public interface Location extends IWillBeScriptable {
 	 * @param forceGet
 	 */
 	@JsSupport( JsVersion.MOZILLA_ONE_DOT_ONE)
-	@Function void reload(boolean forceGet);
+	@OverLoadFunc void reload(boolean forceGet);
 	
+	@JsSupport( JsVersion.MOZILLA_ONE_DOT_ONE)
+	@OverLoadFunc void reload();
+
+
 	/**
 	 * Load the document from the provided URL
 	 * @param url

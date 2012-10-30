@@ -260,6 +260,12 @@ public class ALocation extends ActiveObject implements Location {
 		}
 	}
 
+	public void reload() {
+		if (getBrowserBinding() != null) {
+			getBrowserBinding().locationReload(false);
+		}
+	}
+	
 	public void reload(boolean forceGet) {
 		if (getBrowserBinding() != null) {
 			getBrowserBinding().locationReload(forceGet);
