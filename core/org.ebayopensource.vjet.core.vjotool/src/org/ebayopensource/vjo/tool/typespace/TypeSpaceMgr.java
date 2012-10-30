@@ -82,7 +82,7 @@ public class TypeSpaceMgr {
 
 	private volatile boolean m_loaded = true;
 
-	private volatile boolean m_fullyLoaded = false;
+	private volatile boolean m_fullyLoaded = true;
 
 	private Map<String, URI> m_typeToFileMap = new HashMap<String, URI>();
 
@@ -190,7 +190,14 @@ public class TypeSpaceMgr {
 	public static void processEvent(ISourceEvent<IEventListenerHandle> event,
 			ISourceEventCallback<IJstType> callback) {
 		try {
-			TypeSpaceMgr.getInstance().getController().getJstTypeSpaceMgr().processEvent(event, callback);
+			// using sync call since builder will call multiple
+			TypeSpaceMgr.getInstance().getController().getJstTypeSpaceMgr().processEvent(event);
+			// TODO pass monitor/callback into processEvent Not correct but temporary - always successful
+			if(callback!=null){
+				callback.onComplete( new EventListenerStatus<IJstType>(
+						EventListenerStatus.Code.Successful));
+			}
+			
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
@@ -340,7 +347,7 @@ public class TypeSpaceMgr {
 
 	}
 
-	private void cleanGroup(String group) {
+	public void cleanGroup(String group) {
 		if (!TsLibLoader.isDefaultLibName(group)) {
 			setLoaded(false);
 			processEvent(new RemoveGroupEvent(group, group));
@@ -430,7 +437,7 @@ public class TypeSpaceMgr {
 			}
 		}
 
-		m_fullyLoaded = false;
+//		m_fullyLoaded = false;
 
 		processEvent(batch, new ISourceEventCallback<IJstType>() {
 			public void onComplete(EventListenerStatus<IJstType> status) {
@@ -803,7 +810,7 @@ public class TypeSpaceMgr {
 	}
 
 	public void setAllowChanges(boolean isAllowChanges) {
-		this.isAllowChanges = isAllowChanges;
+	//	this.isAllowChanges = isAllowChanges;
 	}
 
 	/**
