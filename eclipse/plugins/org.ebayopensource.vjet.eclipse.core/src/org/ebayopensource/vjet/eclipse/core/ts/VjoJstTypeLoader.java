@@ -225,8 +225,8 @@ public class VjoJstTypeLoader implements IJstTypeLoader {
 
 	private boolean isExcluded(File srcFolder, File file, List<String> inclusionPatterns,
 			List<String> exclusionPatterns) {
-		if( inclusionPatterns.size()==0 || exclusionPatterns.size()==0){
-			return true;
+		if( inclusionPatterns.size()==0 && exclusionPatterns.size()==0){
+			return false;
 		}
 		
 		char[][] inclusionPatternsChar = new char[][]{};
