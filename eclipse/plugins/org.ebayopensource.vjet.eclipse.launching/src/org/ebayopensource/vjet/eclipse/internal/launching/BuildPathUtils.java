@@ -73,6 +73,8 @@ public class BuildPathUtils {
 
 		ExternalFoldersManager foldersManager = ModelManager
 				.getExternalManager();
+		
+		
 		foldersManager.createLinkFolderKeepFolderName(linkName, new Path(
 				linkName), uri, true, null);
 

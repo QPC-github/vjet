@@ -13,7 +13,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- 
+
  *******************************************************************************/
 package org.ebayopensource.vjet.eclipse.internal.launching;
 
@@ -63,62 +63,38 @@ import org.eclipse.dltk.mod.launching.ScriptRuntime.DefaultInterpreterEntry;
  */
 public class JsContainerInitializer extends BuildpathContainerInitializer {
 
-	
 	private static IAccessRule[] EMPTY_RULES = new IAccessRule[0];
 
-	public void initialize(final IPath containerPath, final IScriptProject project)
-			throws CoreException {
+	public void initialize(final IPath containerPath,
+			final IScriptProject project) throws CoreException {
 		int size = containerPath.segmentCount();
 		if (size > 0) {
 			if (containerPath.segment(0).equals(VjetPlugin.JS_DEFAULT_SDK)) {
-				
+
 				final String[] defaultLibs = TsLibLoader.getJsNativeGroups();
-				
-				Job job = new Job("Add Links") {
-					public IStatus run(IProgressMonitor monitor) {
-						try {
-							IInterpreterInstall interp = resolveInterpreter(
-									getNatureFromProject(project),
-									getEnvironmentFromProject(project), containerPath);
-							JsSdkBuildpathContainer container = null;
-							
-							for(String group: defaultLibs){
-								BuildPathUtils.addLinkForGroup(group);
-							}
-							
-							container = new JsSdkBuildpathContainer(interp, containerPath);
-							container.setEntries(createEntries());
-							DLTKCore.setBuildpathContainer(containerPath,
-									new IScriptProject[] { project },
-									new IBuildpathContainer[] { container }, null);
-							
-							
-						} catch (CoreException e) {
-							return e.getStatus();
-						} finally {
-							monitor.done();
-						}
-						return Status.OK_STATUS;
-					}
-				};
-				job.setRule(ResourcesPlugin.getWorkspace().getRoot());
-				job.schedule();
-				
-				
-				
-				
-				
-				
-				
-				
+
+				IInterpreterInstall interp = resolveInterpreter(
+						getNatureFromProject(project),
+						getEnvironmentFromProject(project), containerPath);
+				JsSdkBuildpathContainer container = null;
+
+				for (String group : defaultLibs) {
+					BuildPathUtils.addLinkForGroup(group);
+				}
+
+				container = new JsSdkBuildpathContainer(interp, containerPath);
+				container.setEntries(createEntries());
+				DLTKCore.setBuildpathContainer(containerPath,
+						new IScriptProject[] { project },
+						new IBuildpathContainer[] { container }, null);
+
 			}
-			
+
 		}
 	}
-	
 
 	protected List createEntries() {
-		
+
 		TypeSpaceMgr tmg = TypeSpaceMgr.getInstance();
 
 		String[] defaultLibs = TsLibLoader.getJsNativeGroups();
@@ -135,7 +111,7 @@ public class JsContainerInitializer extends BuildpathContainerInitializer {
 			// continue;
 			// entryPath = new Path(f.getCanonicalPath());
 			//
-			//				
+			//
 			String groupName = defaultLibs[i];
 			if (rawEntries.contains(groupName))
 				continue;
@@ -146,27 +122,27 @@ public class JsContainerInitializer extends BuildpathContainerInitializer {
 			 */
 			IBuildpathAttribute[] attributes = new IBuildpathAttribute[0];
 			ArrayList excluded = new ArrayList(); // paths to exclude
-//			IEnvironment env = LocalEnvironment.getInstance();
-			
+			// IEnvironment env = LocalEnvironment.getInstance();
+
 			entries.add(new BuildpathEntry(IProjectFragment.K_BINARY,
 					IBuildpathEntry.BPE_LIBRARY, ScriptProject
 							.canonicalizedPath(BuildPathUtils
-									.createPathForGroup(groupName)),
-					false, BuildpathEntry.INCLUDE_ALL, (IPath[]) excluded
+									.createPathForGroup(groupName)), false,
+					BuildpathEntry.INCLUDE_ALL, (IPath[]) excluded
 							.toArray(new IPath[excluded.size()]), EMPTY_RULES,
 					false, attributes, false));
-			
-//			entries.add(DLTKCore.newLibraryEntry(EnvironmentPathUtils
-//					.getFullPath(env, getSdkBasePath(groupName)), EMPTY_RULES,
-//					attributes, BuildpathEntry.INCLUDE_ALL, (IPath[]) excluded
-//							.toArray(new IPath[excluded.size()]), false, true));
+
+			// entries.add(DLTKCore.newLibraryEntry(EnvironmentPathUtils
+			// .getFullPath(env, getSdkBasePath(groupName)), EMPTY_RULES,
+			// attributes, BuildpathEntry.INCLUDE_ALL, (IPath[]) excluded
+			// .toArray(new IPath[excluded.size()]), false, true));
 			// entries.add(DLTKCore.newExtLibraryEntry(getSdkBasePath(groupName)));
 			rawEntries.add(groupName);
-			
+
 		}
-		
+
 		return entries;
-		
+
 	}
 
 	/**
@@ -260,8 +236,7 @@ public class JsContainerInitializer extends BuildpathContainerInitializer {
 					DLTKLaunchingPlugin.getUniqueIdentifier(),
 					ScriptLaunchConfigurationConstants.ERR_INTERPRETER_INSTALL_DOES_NOT_EXIST,
 					MessageFormat
-							.format(
-									LaunchingMessages.InterpreterEnvironmentContainerInitializer_InterpreterEnvironment_referenced_by_classpath_container__0__does_not_exist__1,
+							.format(LaunchingMessages.InterpreterEnvironmentContainerInitializer_InterpreterEnvironment_referenced_by_classpath_container__0__does_not_exist__1,
 									new String[] { containerPath.toString() }),
 					null);
 			throw new CoreException(status);
@@ -283,8 +258,7 @@ public class JsContainerInitializer extends BuildpathContainerInitializer {
 							DLTKLaunchingPlugin.getUniqueIdentifier(),
 							ScriptLaunchConfigurationConstants.ERR_INTERNAL_ERROR,
 							MessageFormat
-									.format(
-											LaunchingMessages.InterpreterEnvironmentContainerInitializer_Buildpath_entry__0__does_not_refer_to_an_existing_library__2,
+									.format(LaunchingMessages.InterpreterEnvironmentContainerInitializer_Buildpath_entry__0__does_not_refer_to_an_existing_library__2,
 											new String[] { entry.getPath()
 													.toString() }), null);
 					throw new CoreException(status);
@@ -295,8 +269,7 @@ public class JsContainerInitializer extends BuildpathContainerInitializer {
 						DLTKLaunchingPlugin.getUniqueIdentifier(),
 						ScriptLaunchConfigurationConstants.ERR_INTERNAL_ERROR,
 						MessageFormat
-								.format(
-										LaunchingMessages.InterpreterEnvironmentContainerInitializer_Buildpath_entry__0__does_not_refer_to_a_library__3,
+								.format(LaunchingMessages.InterpreterEnvironmentContainerInitializer_Buildpath_entry__0__does_not_refer_to_a_library__3,
 										new String[] { entry.getPath()
 												.toString() }), null);
 				throw new CoreException(status);
@@ -315,8 +288,7 @@ public class JsContainerInitializer extends BuildpathContainerInitializer {
 		}
 		if (tag != null) {
 			return MessageFormat
-					.format(
-							LaunchingMessages.InterpreterEnvironmentContainer_InterpreterEnvironment_System_Library_1,
+					.format(LaunchingMessages.InterpreterEnvironmentContainer_InterpreterEnvironment_System_Library_1,
 							new String[] { tag });
 		}
 		return LaunchingMessages.InterpreterEnvironmentContainerInitializer_Default_System_Library_1;

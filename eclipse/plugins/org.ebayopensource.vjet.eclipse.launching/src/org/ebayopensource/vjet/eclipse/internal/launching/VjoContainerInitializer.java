@@ -13,7 +13,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- 
+
  *******************************************************************************/
 package org.ebayopensource.vjet.eclipse.internal.launching;
 
@@ -74,76 +74,59 @@ import org.ebayopensource.vjo.lib.TsLibLoader;
 public class VjoContainerInitializer extends BuildpathContainerInitializer {
 
 	private static IAccessRule[] EMPTY_RULES = new IAccessRule[0];
-	
-	public void initialize(final IPath containerPath, final IScriptProject project)
-			throws CoreException {
+
+	public void initialize(final IPath containerPath,
+			final IScriptProject project) throws CoreException {
 		int size = containerPath.segmentCount();
 		if (size > 0) {
 			if (containerPath.segment(0).equals(VjetPlugin.VJOLIB_ID)) {
-				
-				Job job = new Job("Add Links") {
-					public IStatus run(IProgressMonitor monitor) {
-						try {
-							IInterpreterInstall interp = resolveInterpreter(
-									getNatureFromProject(project),
-									getEnvironmentFromProject(project), containerPath);
-							VjoSdkBuildpathContainer container = null;
-							
-							BuildPathUtils.addLinkForGroup("VjoSelfDescribed");
-							
-							container = new VjoSdkBuildpathContainer(interp, containerPath);
-							container.setEntries(createEntries());
-							DLTKCore.setBuildpathContainer(containerPath,
-									new IScriptProject[] { project },
-									new IBuildpathContainer[] { container }, null);
-							
-							
-						} catch (CoreException e) {
-							return e.getStatus();
-						} finally {
-							monitor.done();
-						}
-						return Status.OK_STATUS;
-					}
-				};
-				job.setRule(ResourcesPlugin.getWorkspace().getRoot());
-				job.schedule();
-				
-				
-				
-				
-				
-				
-				
-				
+
+				try {
+					IInterpreterInstall interp = resolveInterpreter(
+							getNatureFromProject(project),
+							getEnvironmentFromProject(project), containerPath);
+					VjoSdkBuildpathContainer container = null;
+
+					BuildPathUtils.addLinkForGroup("VjoSelfDescribed");
+
+					container = new VjoSdkBuildpathContainer(interp,
+							containerPath);
+					container.setEntries(createEntries());
+					DLTKCore.setBuildpathContainer(containerPath,
+							new IScriptProject[] { project },
+							new IBuildpathContainer[] { container }, null);
+
+				} catch (CoreException e) {
+					// do nothing link will 
+					//e.printStackTrace();
+				}
+
 			}
-			
+
 		}
 	}
 
-
 	protected List createEntries() {
 		List entries = new ArrayList(1);
-	
-			/*
-			 * if (!entryPath.isAbsolute()) Assert.isTrue(false, "Path for
-			 * IBuildpathEntry must be absolute"); //$NON-NLS-1$
-			 */
-			IBuildpathAttribute[] attributes = new IBuildpathAttribute[0];
-			ArrayList excluded = new ArrayList(); // paths to exclude
-			IEnvironment env = LocalEnvironment.getInstance();
-			
-			entries.add(new BuildpathEntry(IProjectFragment.K_BINARY,
-					IBuildpathEntry.BPE_LIBRARY, ScriptProject
-							.canonicalizedPath(BuildPathUtils
-									.createPathForGroup("VjoSelfDescribed")),
-					false, BuildpathEntry.INCLUDE_ALL, (IPath[]) excluded
-							.toArray(new IPath[excluded.size()]), EMPTY_RULES,
-					false, attributes, false));
-			
+
+		/*
+		 * if (!entryPath.isAbsolute()) Assert.isTrue(false, "Path for
+		 * IBuildpathEntry must be absolute"); //$NON-NLS-1$
+		 */
+		IBuildpathAttribute[] attributes = new IBuildpathAttribute[0];
+		ArrayList excluded = new ArrayList(); // paths to exclude
+		IEnvironment env = LocalEnvironment.getInstance();
+
+		entries.add(new BuildpathEntry(IProjectFragment.K_BINARY,
+				IBuildpathEntry.BPE_LIBRARY, ScriptProject
+						.canonicalizedPath(BuildPathUtils
+								.createPathForGroup("VjoSelfDescribed")),
+				false, BuildpathEntry.INCLUDE_ALL, (IPath[]) excluded
+						.toArray(new IPath[excluded.size()]), EMPTY_RULES,
+				false, attributes, false));
+
 		return entries;
 	}
-
 
 	/**
 	 * Returns the Interpreter install associated with the container path, or
@@ -236,8 +219,7 @@ public class VjoContainerInitializer extends BuildpathContainerInitializer {
 					DLTKLaunchingPlugin.getUniqueIdentifier(),
 					ScriptLaunchConfigurationConstants.ERR_INTERPRETER_INSTALL_DOES_NOT_EXIST,
 					MessageFormat
-							.format(
-									LaunchingMessages.InterpreterEnvironmentContainerInitializer_InterpreterEnvironment_referenced_by_classpath_container__0__does_not_exist__1,
+							.format(LaunchingMessages.InterpreterEnvironmentContainerInitializer_InterpreterEnvironment_referenced_by_classpath_container__0__does_not_exist__1,
 									new String[] { containerPath.toString() }),
 					null);
 			throw new CoreException(status);
@@ -259,8 +241,7 @@ public class VjoContainerInitializer extends BuildpathContainerInitializer {
 							DLTKLaunchingPlugin.getUniqueIdentifier(),
 							ScriptLaunchConfigurationConstants.ERR_INTERNAL_ERROR,
 							MessageFormat
-									.format(
-											LaunchingMessages.InterpreterEnvironmentContainerInitializer_Buildpath_entry__0__does_not_refer_to_an_existing_library__2,
+									.format(LaunchingMessages.InterpreterEnvironmentContainerInitializer_Buildpath_entry__0__does_not_refer_to_an_existing_library__2,
 											new String[] { entry.getPath()
 													.toString() }), null);
 					throw new CoreException(status);
@@ -271,8 +252,7 @@ public class VjoContainerInitializer extends BuildpathContainerInitializer {
 						DLTKLaunchingPlugin.getUniqueIdentifier(),
 						ScriptLaunchConfigurationConstants.ERR_INTERNAL_ERROR,
 						MessageFormat
-								.format(
-										LaunchingMessages.InterpreterEnvironmentContainerInitializer_Buildpath_entry__0__does_not_refer_to_a_library__3,
+								.format(LaunchingMessages.InterpreterEnvironmentContainerInitializer_Buildpath_entry__0__does_not_refer_to_a_library__3,
 										new String[] { entry.getPath()
 												.toString() }), null);
 				throw new CoreException(status);
@@ -291,8 +271,7 @@ public class VjoContainerInitializer extends BuildpathContainerInitializer {
 		}
 		if (tag != null) {
 			return MessageFormat
-					.format(
-							LaunchingMessages.InterpreterEnvironmentContainer_InterpreterEnvironment_System_Library_1,
+					.format(LaunchingMessages.InterpreterEnvironmentContainer_InterpreterEnvironment_System_Library_1,
 							new String[] { tag });
 		}
 		return LaunchingMessages.InterpreterEnvironmentContainerInitializer_Default_System_Library_1;

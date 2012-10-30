@@ -83,34 +83,36 @@ public class BrowserContainerInitializer extends BuildpathContainerInitializer {
 				
 				final String[] defaultLibs = TsLibLoader.getBrowserGroups();
 				
-				Job job = new Job("Add Links") {
-					public IStatus run(IProgressMonitor monitor) {
-						try {
-							IInterpreterInstall interp = resolveInterpreter(
-									getNatureFromProject(project),
-									getEnvironmentFromProject(project), containerPath);
-							BrowserSdkBuildpathContainer container = null;
-							for (String group : defaultLibs) {
-								BuildPathUtils.addLinkForGroup(group);
-							}
-							
-							container = new BrowserSdkBuildpathContainer(interp, containerPath);
-							container.setEntries(createEntries());
-							DLTKCore.setBuildpathContainer(containerPath,
-									new IScriptProject[] { project },
-									new IBuildpathContainer[] { container }, null);
-							
-							
-						} catch (CoreException e) {
-							return e.getStatus();
-						} finally {
-							monitor.done();
-						}
-						return Status.OK_STATUS;
-					}
-				};
-				job.setRule(ResourcesPlugin.getWorkspace().getRoot());
-				job.schedule();
+				IInterpreterInstall interp = resolveInterpreter(
+						getNatureFromProject(project),
+						getEnvironmentFromProject(project), containerPath);
+				BrowserSdkBuildpathContainer container = null;
+				for (String group : defaultLibs) {
+					BuildPathUtils.addLinkForGroup(group);
+				}
+				
+				container = new BrowserSdkBuildpathContainer(interp, containerPath);
+				container.setEntries(createEntries());
+				DLTKCore.setBuildpathContainer(containerPath,
+						new IScriptProject[] { project },
+						new IBuildpathContainer[] { container }, null);
+				
+//				Job job = new Job("Add Links") {
+//					public IStatus run(IProgressMonitor monitor) {
+//						try {
+//						
+//							
+//							
+//						} catch (CoreException e) {
+//							return e.getStatus();
+//						} finally {
+//							monitor.done();
+//						}
+//						return Status.OK_STATUS;
+//					}
+//				};
+//				job.setRule(ResourcesPlugin.getWorkspace().getRoot());
+//				job.schedule();
 				
 				
 				
