@@ -60,6 +60,12 @@ public class VjoMehtodOccurrenceVisitor extends AbstractVjoOccurrenceVisitor {
 	}
 
 	private void checkNode(IJstNode node, IJstNode checkingNode) {
+		
+		// to handle overloaded method case
+		if(checkingNode.getParentNode() instanceof IJstMethod){
+			checkingNode = checkingNode.getParentNode();
+		}
+	
 		if (checkingNode instanceof IJstMethod) {
 			if (matchNode(checkingNode)) {
 				addMatch(node);

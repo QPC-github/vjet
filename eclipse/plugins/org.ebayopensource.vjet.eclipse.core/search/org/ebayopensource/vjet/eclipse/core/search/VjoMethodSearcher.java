@@ -229,6 +229,11 @@ public class VjoMethodSearcher extends AbstractVjoElementSearcher {
 	 */
 	public List<VjoMatch> findOccurrence(IJstNode searchedJstNode,
 			IJstNode searchedTree) {
+		
+		if(searchedJstNode.getParentNode() instanceof IJstMethod){
+			searchedJstNode = (IJstMethod)searchedJstNode.getParentNode();
+		}
+		
 		VjoMehtodOccurrenceVisitor visitor = new VjoMehtodOccurrenceVisitor(
 				(IJstMethod) searchedJstNode);
 		searchedTree.accept(visitor);
