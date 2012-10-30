@@ -104,7 +104,7 @@ public class VjoSourceModule extends JSSourceModule implements
 			WorkingCopyOwner owner) {
 
 		super(parent, name, owner);
-		mgr.addTypeSpaceListener(this);
+//		mgr.addTypeSpaceListener(this);
 	}
 
 	@Override
@@ -416,6 +416,9 @@ public class VjoSourceModule extends JSSourceModule implements
 	
 
 	public IJstType getJstType() {
+		if(jstType==null){
+			jstType = mgr.getController().getJstTypeSpaceMgr().getQueryExecutor().findType(getTypeName());
+		}
 		return jstType;
 	}
 
