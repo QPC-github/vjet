@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.ebayopensource.dsf.jst.IJstType;
+import org.ebayopensource.dsf.jst.JstSource;
 import org.ebayopensource.dsf.jst.token.IExpr;
 import org.ebayopensource.dsf.jstojava.translator.robust.completion.IJstCompletion;
 
@@ -24,6 +25,20 @@ public class TypeConstructContext implements ITypeConstructContext {
 	private final IJstCompletion jstCompletion;
 	private final Class<? extends IExpr> exprClass;
 	private String groupName;
+	private JstSource workingSource;
+	private String orginalTypeName;
+
+	public JstSource getWorkingSource() {
+		return workingSource;
+	}
+
+
+
+	public void setWorkingSource(JstSource workingSource) {
+		this.workingSource = workingSource;
+	}
+
+
 
 	public Class<? extends IExpr> getExprClass() {
 		return exprClass;
@@ -32,7 +47,7 @@ public class TypeConstructContext implements ITypeConstructContext {
 
 
 	public TypeConstructContext(IExpr inputExpr, IExpr lhsExpr,
-			List<IExpr> argsExprList, IJstCompletion jstCompletion, Class<? extends IExpr> class1, String groupName) {
+			List<IExpr> argsExprList, IJstCompletion jstCompletion, Class<? extends IExpr> class1, String groupName, JstSource source, String typeName) {
 
 		this.inputExpr = inputExpr;
 		this.lhsExpr = lhsExpr;
@@ -41,6 +56,8 @@ public class TypeConstructContext implements ITypeConstructContext {
 		this.exprClass = class1;
 		resolvedJstTypes = new ArrayList<IJstType>();
 		this.setGroupName(groupName);
+		this.workingSource = source;
+		this.orginalTypeName = typeName;
 	}
 
 	@Override
@@ -117,6 +134,13 @@ public class TypeConstructContext implements ITypeConstructContext {
 
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
+	}
+
+
+
+	@Override
+	public String getOriginalTypeName() {
+		return orginalTypeName;
 	}
 
 }

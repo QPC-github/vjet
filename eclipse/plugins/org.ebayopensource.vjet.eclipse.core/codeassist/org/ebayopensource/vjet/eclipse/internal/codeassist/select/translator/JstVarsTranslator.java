@@ -55,8 +55,15 @@ public class JstVarsTranslator extends DefaultNodeTranslator {
 		
 		if(declaringBlock instanceof JstMethod){
 			IJstMethod jstMethod = (JstMethod)declaringBlock;
-			if (element == null && jstMethod!=null  &&  !jstMethod.getOverloaded().isEmpty()) {//get the first signature method
-				element = JstNodeDLTKElementResolver.convert(module, jstMethod.getOverloaded().get(0))[0];
+			if ( jstMethod!=null  ) {//get the first signature method
+				if(!jstMethod.getOverloaded().isEmpty()){
+					element = JstNodeDLTKElementResolver.convert(module, jstMethod.getOverloaded().get(0))[0];
+				}else{
+					IModelElement[] convert = JstNodeDLTKElementResolver.convert(module, jstMethod);
+					if(convert!=null && convert.length>0){
+						element = convert[0];
+					}
+				}
 			}
 		}
 		if (element == null ) {
@@ -64,6 +71,7 @@ public class JstVarsTranslator extends DefaultNodeTranslator {
 		}
 		try {
 			IMember dltkMethod = (IMember) element;
+			// TODO support selection engine for var x,y,z;
 			String localVarName = CodeassistUtils.getFirstVariableName(jstVars);
 			IModelElement[] children = dltkMethod.getChildren();
 			for (int i = 0; i < children.length; i++) {

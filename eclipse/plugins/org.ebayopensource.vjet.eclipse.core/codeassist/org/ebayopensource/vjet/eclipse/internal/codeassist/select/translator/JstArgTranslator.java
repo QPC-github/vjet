@@ -39,7 +39,11 @@ public class JstArgTranslator extends DefaultNodeTranslator {
 		// directly to find method argument
 		
 		try {
-			IType dltkType = (IType) JstNodeDLTKElementResolver.convert(module, jstNode.getRootType())[0];
+			IModelElement[] convert = JstNodeDLTKElementResolver.convert(module, jstNode.getRootType());
+			if(convert==null || convert.length==0){
+				return null;
+			}
+			IType dltkType = (IType) convert[0];
 			IModelElement modelElement = dltkType.getSourceModule().getElementAt(jstArg
 					.getSource().getStartOffSet());
 			if (modelElement instanceof JSSourceMethod) {

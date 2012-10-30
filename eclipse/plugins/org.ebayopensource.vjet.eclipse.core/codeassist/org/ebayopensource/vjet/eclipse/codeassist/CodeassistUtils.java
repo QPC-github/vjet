@@ -182,7 +182,14 @@ public class CodeassistUtils {
 	public static IType findType(ScriptProject scriptProject, IJstType jstType) {
 		IJstType outerType = CodeCompletionUtils.getOuterJstType(jstType);
 		if (outerType == jstType) {
-			return findType(scriptProject, jstType.getName());
+			IType type= findType(scriptProject, jstType.getName());
+			if(type!=null){
+				return type;
+			}else{
+				// loop through alias names
+				String alias = jstType.getAlias();
+				return findType(scriptProject, alias);
+			}
 		} else {
 			String packageName = "";
 			if(outerType.getPackage()!=null){
@@ -204,6 +211,18 @@ public class CodeassistUtils {
 	
 	}
 	
+	
+//	private static String getNameFromSource(JstSource source) {
+//		if(source!=null){
+//			IBinding fileBinding = source.getBinding();
+//			if(fileBinding instanceof FileBinding){
+//				File file = ((FileBinding) fileBinding).getFile();
+//				return file.getPath().replace("/", ".");
+//			}
+//		}
+//		return null;
+//	}
+
 	
 	/**
 	 * Find IType from DLTK based on the package name and simple type name

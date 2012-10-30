@@ -6,6 +6,7 @@ package org.ebayopensource.dsf.jstojava.resolver;
 import java.util.List;
 
 import org.ebayopensource.dsf.jst.IJstType;
+import org.ebayopensource.dsf.jst.JstSource;
 import org.ebayopensource.dsf.jst.token.IExpr;
 import org.ebayopensource.dsf.jstojava.translator.robust.completion.IJstCompletion;
 
@@ -65,6 +66,14 @@ public interface ITypeConstructContext {
 	public Class<? extends IExpr> getExprClass();
 	
 	public String getGroupName();
+	
+	/**
+	 * Get the working source info where type is defined
+	 * @return
+	 */
+	public JstSource getWorkingSource();
+	
+	public String getOriginalTypeName();
 
 
 
