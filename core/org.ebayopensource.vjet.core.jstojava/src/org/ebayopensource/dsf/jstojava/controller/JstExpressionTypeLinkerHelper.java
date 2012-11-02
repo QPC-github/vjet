@@ -1037,7 +1037,7 @@ public class JstExpressionTypeLinkerHelper {
 							&& !((JstType) parameterType).getStatus().isValid()) {
 						final JstMixedType mixedOTypes = (JstMixedType) parameterType;
 						for (IJstType mixedType : mixedOTypes.getMixedTypes()) {
-
+							look4ActualBinding(resolver, mixedType, groupInfo);
 						}
 					} else if (parameterType instanceof JstType
 							&& !((JstType) parameterType).getStatus().isValid()) {
@@ -3322,6 +3322,13 @@ public class JstExpressionTypeLinkerHelper {
 			return null;
 		}
 		// bugfix for otype using attributed presentation
+		else if (type instanceof JstMixedType) {
+			for(IJstType mixedType: ((JstMixedType)type).getMixedTypes()){
+				IJstType x = getCorrectType(resolver, mixedType, groupInfo);
+				
+			}
+			return type;
+		}
 		else if (type instanceof JstAttributedType) {
 			final IJstNode rtnBinding = look4ActualBinding(resolver, type,
 					groupInfo);

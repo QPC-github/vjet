@@ -373,6 +373,10 @@ class JstExpressionTypeLinker implements IJstVisitor {
 						(JstMethod) instanceMtd, getType(), m_groupInfo);
 			}
 		}
+		if(node.getConstructor()!=null){
+			JstExpressionTypeLinkerHelper.fixMethodTypeRef(m_resolver,
+					node.getConstructor(), getType(), m_groupInfo);
+		}
 	}
 
 	private void visitJstBlock(final JstBlock jstBlock) {
