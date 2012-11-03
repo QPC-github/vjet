@@ -855,7 +855,7 @@ public class ScriptExplorerContentProvider extends
 			}
 		}
 
-		if (count > 1) {
+		if (count > 0) {
 			// more than one child changed, refresh from here downwards
 			if (element instanceof IScriptFolder) {
 				// a package fragment might become non empty refresh from the
