@@ -280,24 +280,26 @@ public class VjoCcHandler implements IVjoCcHandler {
 						.getRealParent();
 				// TODO problem when this is jst arg not jstmethod
 				JstMethod method = (JstMethod)mtd.getMethod();
-				IJstType type = method.getOwnerType();
-				
-				if(method.isFuncArgMetaExtensionEnabled()){
+				if(method!=null){
+					IJstType type = method.getOwnerType();
 					
-					String targetFunc = method.getOwnerType().getName()
-							+ (method.isStatic() ? "::" : ":")
-							+ method.getName().getName();
-					
-					if(FunctionParamsMetaRegistry.getInstance().isFirstArgumentType(targetFunc,type.getPackage().getGroupName() )){
-						// TODO jstmethod to method key add to utility method
-						// TODO add alias advisor
-						advisors.add(VjoCcTypeProposalAdvisor.ID);
-						advisors.add(VjoCcTypeNameAliasProposalAdvisor.ID);
-						// TODO add package list here
-					//	advisors.add(VjoCcPackageProposalAdvisor.ID);
-						return advisors.toArray(new String[advisors.size()]); 
+					if(method.isFuncArgMetaExtensionEnabled()){
+						
+						String targetFunc = method.getOwnerType().getName()
+								+ (method.isStatic() ? "::" : ":")
+								+ method.getName().getName();
+						
+						if(FunctionParamsMetaRegistry.getInstance().isFirstArgumentType(targetFunc,type.getPackage().getGroupName() )){
+							// TODO jstmethod to method key add to utility method
+							// TODO add alias advisor
+							advisors.add(VjoCcTypeProposalAdvisor.ID);
+							advisors.add(VjoCcTypeNameAliasProposalAdvisor.ID);
+							// TODO add package list here
+						//	advisors.add(VjoCcPackageProposalAdvisor.ID);
+							return advisors.toArray(new String[advisors.size()]); 
+						}
+						
 					}
-					
 				}
 				
 				// TODO add extension here for other libraries to add custom advisors
