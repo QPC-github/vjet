@@ -17,12 +17,13 @@ package org.ebayopensource.vjet.eclipse.vjetv;
  */
 
 import java.io.File;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.Map;
 
+import org.ebayopensource.dsf.jstojava.cml.vjetv.core.HeadLessValidationEntry;
+import org.ebayopensource.vjet.eclipse.core.sdk.VJetSdkEnvironment;
+import org.ebayopensource.vjet.eclipse.core.ts.JstLibResolver;
+import org.ebayopensource.vjo.lib.IResourceResolver;
+import org.ebayopensource.vjo.lib.LibManager;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 
@@ -48,30 +49,41 @@ public class VJETVRunner implements IApplication {
                 .getContextClassLoader();
 
         // Step1. Prepare runtime class path, involving DSFPrebuild and so on.
-        URL url = this.getClass().getProtectionDomain().getCodeSource()
-                .getLocation();
-        File coreJarFile = new File(url.getFile());
-        String installFolderPath = coreJarFile.getAbsolutePath();
-        installFolderPath = installFolderPath.substring(0, installFolderPath
-                .lastIndexOf(File.separator));
-        File installFolder = new File(installFolderPath);
-        File[] files = installFolder.listFiles();
-        ArrayList<URL> fileURL = new ArrayList<URL>();
-        for (int i = 0; i < files.length; i++) {
-            fileURL.add(files[i].toURL());
-        }
+//        URL url = this.getClass().getProtectionDomain().getCodeSource()
+//                .getLocation();
+//        File coreJarFile = new File(url.getFile());
+//        String installFolderPath = coreJarFile.getAbsolutePath();
+//        installFolderPath = installFolderPath.substring(0, installFolderPath
+//                .lastIndexOf(File.separator));
+//        File installFolder = new File(installFolderPath);
+//        File[] files = installFolder.listFiles();
+//        ArrayList<URL> fileURL = new ArrayList<URL>();
+//        for (int i = 0; i < files.length; i++) {
+//            fileURL.add(files[i].toURL());
+//        }
 
         
         //Step3 run VJETV
         try {
-            URLClassLoader classLoader = new URLClassLoader(fileURL
-                    .toArray(new URL[] {}));
-            Thread.currentThread().setContextClassLoader(classLoader);
-            Class entry = classLoader
-                    .loadClass("org.ebayopensource.dsf.jstojava.cml.vjetv.core.HeadLessValidationEntry");
-            Object vjetvEntry = entry.newInstance();
-            Method runVjetvMethod = entry.getMethod("runVjetv", String[].class);
-            runVjetvMethod.setAccessible(true);
+//            URLClassLoader classLoader = new URLClassLoader(fileURL
+//                    .toArray(new URL[] {}));
+//            Thread.currentThread().setContextClassLoader(classLoader);
+//            Class entry = classLoader
+//                    .loadClass("org.ebayopensource.dsf.jstojava.cml.vjetv.core.HeadLessValidationEntry");
+           
+        	IResourceResolver jstLibResolver = JstLibResolver.getInstance()
+    				.setSdkEnvironment(new VJetSdkEnvironment(new String[0], "DefaultSdk"));
+        	// TODO exclusion rules yes -- very important
+        	// TODO project dependencies?
+        	// TODO library dependency .zip format
+        	// TODO clean up message Please check verified JS files writtern by VJO syntax. 
+        	// TODO had issues with java heap 
+        	// TODO look into issues with 
+        	
+    		LibManager.getInstance().setResourceResolver(jstLibResolver);
+        	
+        	org.ebayopensource.dsf.jstojava.cml.vjetv.core.HeadLessValidationEntry vjetvEntry = new HeadLessValidationEntry();
+       
             Map contextArguments = context.getArguments();
             Object o = contextArguments
                     .get(IApplicationContext.APPLICATION_ARGS);
@@ -79,11 +91,12 @@ public class VJETVRunner implements IApplication {
             if (args[0].equalsIgnoreCase("-showlocation")) {
                 String[] actualArgs = new String[args.length - 1];
                 System.arraycopy(args, 1, actualArgs, 0, actualArgs.length);
-                runVjetvMethod.invoke(vjetvEntry, new Object[] { actualArgs });
+                vjetvEntry.runVjetv(actualArgs);
             } else {
-                runVjetvMethod.invoke(vjetvEntry, new Object[] { args });
+            	 vjetvEntry.runVjetv(args);
             }
         } catch (Exception e) {
+        	e.printStackTrace();
         } finally {
             Thread.currentThread().setContextClassLoader(orginalLoader);
         }
