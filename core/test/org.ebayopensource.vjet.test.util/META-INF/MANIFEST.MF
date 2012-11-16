@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.ebayopensource.vjet.test.util;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Export-Package: org.ebayopensource.dsf.test.utils.vjo,
  org.ebayopensource.vjet.test.util
-Require-Bundle: org.eclipse.jdt.core;bundle-version="3.8.1",
+Require-Bundle: org.eclipse.jdt.core,
  org.junit4;bundle-version="4.8.1",
  org.ebayopensource.vjet.core.ext;bundle-version="1.0.0",
  org.ebayopensource.vjet.core.javatojs;bundle-version="1.0.0",
