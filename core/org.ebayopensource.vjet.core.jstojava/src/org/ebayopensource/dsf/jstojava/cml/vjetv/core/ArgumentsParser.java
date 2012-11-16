@@ -288,8 +288,11 @@ public class ArgumentsParser {
                 continue;
             }
             char[][] exclusionPatternsChar = new char[][]{};
+			List<String> exclusionPatterns = conf.getExclusionPatterns();
+			if(exclusionPatterns!=null){
 			exclusionPatternsChar = OnDemandAllTypeLoader.processPatterns(
-					conf.getExclusionPatterns());
+					exclusionPatterns);
+			}
             FileOperator.getAllJSFiles(rootFile, lists, exclusionPatternsChar);
 
             // Add tempfolder's js files
