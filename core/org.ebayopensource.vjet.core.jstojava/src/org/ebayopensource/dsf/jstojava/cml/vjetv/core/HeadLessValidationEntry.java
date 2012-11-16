@@ -9,6 +9,11 @@
 
 package org.ebayopensource.dsf.jstojava.cml.vjetv.core;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
 import org.ebayopensource.dsf.jstojava.cml.vjetv.messages.Messages;
 import org.ebayopensource.dsf.jstojava.cml.vjetv.model.IHeadLessLauncherResult;
 import org.ebayopensource.dsf.jstojava.cml.vjetv.model.IHeadlessLauncherConfigure;
@@ -34,17 +39,30 @@ public class HeadLessValidationEntry {
     private static VjetvHeadlessConfigure convert2VjetvConfig(
             IHeadlessParserConfigure parserConf) {
         VjetvHeadlessConfigure vjetvConf = new VjetvHeadlessConfigure();
-        vjetvConf.setReportType(parserConf.getReprotType());
+        vjetvConf.setLibrariesToLoad(findLibraries(parserConf.getBuildPath()));
+        vjetvConf.setExclusionPatterns(parserConf.getExclusionPatterns());
+        vjetvConf.setReportType(parserConf.getReportType());
         vjetvConf.setValidatedJSFiles(parserConf.getValidatedJSFiles());
         vjetvConf.setReportLevel(parserConf.getReportLevel());
         vjetvConf.setReportPath(parserConf.getReportPath());
-        vjetvConf.setReportType(parserConf.getReprotType());
+        vjetvConf.setReportType(parserConf.getReportType());
         vjetvConf.setVerbose(parserConf.isVerbose());
         vjetvConf.setFailBuild(parserConf.isFailBuild());
         return vjetvConf;
     }
 
-    /**
+    private static List<String> findLibraries(HashSet<File> buildPath) {
+		List<String> libs = new ArrayList<String>();
+		for (File path : buildPath) {
+			if(path.getAbsolutePath().endsWith(".zip")){
+				libs.add(path.getAbsolutePath());
+			}
+		}
+
+		return libs;
+	}
+
+	/**
      * VjetV entry
      * 
      * @param args

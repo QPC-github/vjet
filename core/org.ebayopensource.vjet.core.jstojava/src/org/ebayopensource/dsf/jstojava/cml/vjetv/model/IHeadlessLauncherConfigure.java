@@ -17,6 +17,7 @@ package org.ebayopensource.dsf.jstojava.cml.vjetv.model;
 
 import java.io.File;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 /**
  * The interface used to implement launch configures, Include detail informaton.
@@ -74,7 +75,7 @@ public abstract class IHeadlessLauncherConfigure {
      * 
      * @return int
      */
-    public abstract String getReprotType();
+    public abstract String getReportType();
 
     /**
      * Report verbose
@@ -97,4 +98,8 @@ public abstract class IHeadlessLauncherConfigure {
      * @return String
      */
     public abstract String getReportLevel();
+    
+    public abstract List<String> getLibrariesToLoad();
+
+	public abstract List<String> getExclusionPatterns();
 }

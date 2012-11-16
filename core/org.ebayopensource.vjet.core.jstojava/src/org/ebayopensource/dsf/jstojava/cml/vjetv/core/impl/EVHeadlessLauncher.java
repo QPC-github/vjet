@@ -31,6 +31,7 @@ import org.ebayopensource.dsf.jst.IScriptUnit;
 import org.ebayopensource.dsf.jst.JstProblemId;
 import org.ebayopensource.dsf.jst.declaration.JstBlock;
 import org.ebayopensource.dsf.jst.declaration.JstCache;
+import org.ebayopensource.dsf.jst.declaration.JstFactory;
 import org.ebayopensource.dsf.jst.ts.JstTypeSpaceMgr;
 import org.ebayopensource.dsf.jstojava.cml.vjetv.core.IHeadLessLauncher;
 import org.ebayopensource.dsf.jstojava.cml.vjetv.model.IHeadLessLauncherResult;
@@ -47,6 +48,8 @@ import org.ebayopensource.dsf.jstojava.controller.JstParseController;
 import org.ebayopensource.dsf.jstojava.loader.OnDemandAllTypeLoader;
 import org.ebayopensource.dsf.jstojava.parser.VjoParser;
 import org.ebayopensource.dsf.ts.event.group.AddGroupEvent;
+import org.ebayopensource.dsf.ts.event.type.AddTypeEvent;
+import org.ebayopensource.dsf.ts.group.IGroup;
 import org.ebayopensource.dsf.ts.type.TypeName;
 import org.ebayopensource.vjo.lib.LibManager;
 import org.ebayopensource.vjo.lib.TsLibLoader;
@@ -87,15 +90,12 @@ public class EVHeadlessLauncher implements IHeadLessLauncher {
             throw new AssertionError("Unable to find specified test file.");
         jstType = ts.getTypeSpace().getType(
                 new TypeName(ONDEMAND, unit.getType().getName()));
-        if (jstType == null)
-            throw new AssertionError("Unable to parse specified test file.");
-        if (unit.getProblems().size() > 0) {
-            throw new AssertionError("Test js file has syntax errors.");
-        }
+        ts.processEvent(new AddTypeEvent<IJstType>(new TypeName(ONDEMAND,unit.getType().getName()), unit.getType()));
+
         driver.setTypeSpaceMgr(ts);
 
         List<IScriptUnit> types = new ArrayList<IScriptUnit>();
-        final IJstType resolvedType = jstType;
+        final IJstType resolvedType = unit.getType();
 
         types.add(new IScriptUnit() {
 
@@ -229,12 +229,69 @@ public class EVHeadlessLauncher implements IHeadLessLauncher {
     private void launchValidate(IHeadlessLauncherConfigure conf,
             IHeadLessReporter reporter, EVLauncherResult result) {
         File validateFile = null;
+        List<String> librariesToLoad = conf.getLibrariesToLoad();
         LinkedHashSet<File> jsFiles = conf.getValidatedJSFiles();
         List<VjoSemanticProblem> actualProblemList = null;
         BaseReporter baseReporter = (BaseReporter) reporter;
         int i = 0;
         final int size = jsFiles.size();
+       
+        // it would be better to create an ondemand group 
+        // setup dependencies first
+        // and pass in multiple files
+        // there is a challenge of getting IScriptUnit vs IJstType 
         
+        // Step1: init parser and controller
+        // finish line63.64
+
+        // Step2: parse specify JS file
+        
+        // TEMP load first file 
+        IScriptUnit unit = c.parse(ONDEMAND, "",
+                "");
+
+        // Step3: load depend jsttypes from source path.
+        JstTypeSpaceMgr mgr = new JstTypeSpaceMgr(c, new OnDemandAllTypeLoader(
+                ONDEMAND, JstFactory.getInstance().createJstType(false)));
+
+        // Step4: initilize mgr
+        mgr.initialize();
+        TsLibLoader.loadDefaultLibs(mgr);
+        try {
+            JstCache.getInstance().addLib(
+                    LibManager.getInstance().getVjoJavaLib());
+            mgr.loadLibrary(LibManager.getInstance().getVjoJavaLib(),
+                    LibManager.VJO_JAVA_LIB_NAME);
+        } catch (Exception e) {
+        }
+
+        mgr.processEvent(new AddGroupEvent(ONDEMAND, null,
+                Collections.EMPTY_LIST, Collections.EMPTY_LIST, Collections.EMPTY_LIST,
+                Collections.EMPTY_LIST, null,conf.getExclusionPatterns()));
+        // TODO read this off a file rather than hard wired
+        IGroup<IJstType> jsnative = mgr.getTypeSpace().getGroup(LibManager.JS_NATIVE_LIB_NAME);
+        IGroup<IJstType> group = mgr.getTypeSpace().getGroup(ONDEMAND);
+		group.addGroupDependency(jsnative);
+        IGroup<IJstType> browserlib = mgr.getTypeSpace().getGroup("JsBrowserLib");
+        group.addGroupDependency(browserlib);
+        IGroup<IJstType> vjolib = mgr.getTypeSpace().getGroup("VjoSelfDescribed");
+        group.addGroupDependency(vjolib);
+        
+        for(String library: librariesToLoad){
+        	mgr.processEvent(new AddGroupEvent(library, library));
+        	group.addGroupDependency(mgr.getTypeSpace().getGroup(library));
+        }
+        
+        
+        // load in zip should we use loader here?
+       
+        
+        // we need to load the custom library dependencies
+        // zip could be there with .js and/or .ser
+        // we will support both for now
+        
+        
+
         baseReporter.printCurrentStates("<Start to Validate... ==============================" +
                 "============================================" +
                 "============================================>\n");
@@ -256,10 +313,11 @@ public class EVHeadlessLauncher implements IHeadLessLauncher {
                     resultDataMap.put(validateFile, actualProblemList);
                 }
             } catch (Throwable e) {
+            	e.printStackTrace();
                 reporter.printCurrentStates("Error Message :  "
                         + e.getMessage() + "\n");
                 reporter
-                        .printCurrentStates("Please check verified JS files writtern by VJO syntax. \n");
+                        .printCurrentStates("Please check file:"+ validateFile+". \n");
                 resultDataMap.put(validateFile, e.getMessage());
             }
         }
@@ -326,33 +384,11 @@ public class EVHeadlessLauncher implements IHeadLessLauncher {
     public List<VjoSemanticProblem> validateFile(File validateFile) {
         List<VjoSemanticProblem> actualProblemList = new ArrayList<VjoSemanticProblem>();
 
-        // Step1: init parser and controller
-        // finish line63.64
-
-        // Step2: parse specify JS file
-        IScriptUnit unit = c.parse(ONDEMAND, validateFile.getAbsolutePath(),
-                VjoParser.getContent(validateFile));
-
-        // Step3: load depend jsttypes from source path.
-        JstTypeSpaceMgr mgr = new JstTypeSpaceMgr(c, new OnDemandAllTypeLoader(
-                ONDEMAND, unit.getType()));
-
-        // Step4: initilize mgr
-        mgr.initialize();
-        TsLibLoader.loadDefaultLibs(mgr);
-        try {
-            JstCache.getInstance().addLib(
-                    LibManager.getInstance().getVjoJavaLib());
-            mgr.loadLibrary(LibManager.getInstance().getVjoJavaLib(),
-                    LibManager.VJO_JAVA_LIB_NAME);
-        } catch (Exception e) {
-        }
 
         // Step5: Resolve JS file and do syntax validation.
-        unit = c.parseAndResolve(ONDEMAND, validateFile.getAbsolutePath(),
+        IScriptUnit unit = c.parseAndResolve(ONDEMAND, validateFile.getAbsolutePath(),
                 VjoParser.getContent(validateFile));
-        mgr.processEvent(new AddGroupEvent(ONDEMAND, null,
-                Collections.EMPTY_LIST, Collections.EMPTY_LIST));
+      
 
         // Step6: Handle syntax problems if syntax problem exist.
         if (unit.getProblems().size() > 0) {
@@ -360,7 +396,7 @@ public class EVHeadlessLauncher implements IHeadLessLauncher {
         }
 
         // Step7: Do semantic validate
-        actualProblemList = doSemanticValidate(unit, mgr);
+        actualProblemList = doSemanticValidate(unit, c.getJstTypeSpaceMgr());
         return actualProblemList;
 
     }

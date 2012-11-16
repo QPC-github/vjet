@@ -199,7 +199,8 @@ public class EVHeadleassTask extends Task {
                 .hasNext();) {
             sourceFolderFile = isPathValid(iterator.next());
             if (sourceFolderFile != null) {
-                FileOperator.getAllJSFiles(sourceFolderFile, m_jsFiles);
+            	
+                FileOperator.getAllJSFiles(sourceFolderFile, m_jsFiles,null);
             }
         }
 

@@ -11,6 +11,7 @@ package org.ebayopensource.dsf.jstojava.cml.vjetv.model.impl;
 import java.io.File;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import org.ebayopensource.dsf.jstojava.cml.vjetv.model.IHeadlessParserConfigure;
 
@@ -41,6 +42,8 @@ public class HeadlessParserConfigure extends IHeadlessParserConfigure {
      * The value is used for store verbose value
      */
     private boolean m_isFailBuild = false;
+
+	private List<String> m_exclusionPtterns;
 
     /**
      * This method use to get isBuild value
@@ -96,7 +99,7 @@ public class HeadlessParserConfigure extends IHeadlessParserConfigure {
 
 
     @Override
-    public String getReprotType() {
+    public String getReportType() {
         return m_reportType;
     }
 
@@ -209,4 +212,14 @@ public class HeadlessParserConfigure extends IHeadlessParserConfigure {
     public void setPolicyFilePath(String path){
         this.m_policyPath = path;
     }
+
+	@Override
+	public List<String> getExclusionPatterns() {
+		return m_exclusionPtterns;
+	}
+	
+	public void setExclusionPatterns(List<String> exclusionPatterns){
+		m_exclusionPtterns = exclusionPatterns;
+	}
+	
 }

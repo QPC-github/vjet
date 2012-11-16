@@ -31,6 +31,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import org.ebayopensource.dsf.jstojava.loader.OnDemandAllTypeLoader;
+
 /**
  * utility class for ebay vjet validation service, used to operator file in
  * local disk.
@@ -215,17 +217,18 @@ public class FileOperator {
      *            {@link File}
      * @param lists
      *            {@link ArrayList}
+     * @param exclusionRules 
      */
-    public static void getAllJSFiles(File file, LinkedHashSet<File> lists) {
+    public static void getAllJSFiles(File file, LinkedHashSet<File> lists, char[][] exclusionRules) {
         if (file.isDirectory() && file.canRead()) {
             File[] files = file.listFiles();
             for (int i = 0; i < files.length; i++) {
                 if (files[i].isFile() && files[i].canRead()) {
-                    if (isJSFiles(files[i])) {
+                    if (isJSFiles(files[i]) && !OnDemandAllTypeLoader.isExcluded(files[i].getAbsolutePath().toCharArray(),null,exclusionRules,false)) {
                         lists.add(files[i]);
                     }
                 } else if (files[i].isDirectory() && files[i].canRead()) {
-                    getAllJSFiles(files[i], lists);
+                    getAllJSFiles(files[i], lists, exclusionRules);
                 }
             }
         }
@@ -509,5 +512,7 @@ public class FileOperator {
         }
         return flag;
     }
+
+
 
 }

@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -35,6 +36,7 @@ import org.ebayopensource.dsf.jstojava.cml.vjetv.parser.Options;
 import org.ebayopensource.dsf.jstojava.cml.vjetv.parser.ParseException;
 import org.ebayopensource.dsf.jstojava.cml.vjetv.util.FileOperator;
 import org.ebayopensource.dsf.jstojava.cml.vjetv.util.ParserHelper;
+import org.ebayopensource.dsf.jstojava.loader.OnDemandAllTypeLoader;
 
 /**
  * This class is used to parse command from end user when the service target is
@@ -84,6 +86,8 @@ public class ArgumentsParser {
      * Short single-character name of the option.
      */
     private static final String EXPORT_POLICY = "ep"; //$NON-NLS-1$
+    
+	private static final String EXCLUSION_RULE = "exclude";
 
     /**
      * Short single-character name of the option.
@@ -157,10 +161,15 @@ public class ArgumentsParser {
             new String[] { IMPORT_POLICY, "importPolicy",
                     "Import validation policy" },
             new String[] { EXPORT_POLICY, "exportPolicy",
-                    "Export valdiation policy" }
+                    "Export valdiation policy" },
+            new String[] { "excl", //$NON-NLS-1$
+            		EXCLUSION_RULE, //$NON-NLS-1$
+                            "Excludes directories or files matching pattern ie *mypath/*" } //$NON-NLS-1$
     // new String[] { REPORT_TYPE, "reportType", "report file type" },
 
     }; //$NON-NLS-1$
+
+
 
     /**
      * Calculate all env
@@ -192,8 +201,7 @@ public class ArgumentsParser {
             buildPathSets.addAll(buildPath);
         }
 
-        // Step4: Add user.dir directory to build path
-        buildPathSets.add(new File(System.getProperty(FileOperator.USER_DIR)));
+
     }
 
     /**
@@ -279,13 +287,20 @@ public class ArgumentsParser {
             if (!isPathValid(rootFile, true)) {
                 continue;
             }
-            FileOperator.getAllJSFiles(rootFile, lists);
+            char[][] exclusionPatternsChar = new char[][]{};
+			exclusionPatternsChar = OnDemandAllTypeLoader.processPatterns(
+					conf.getExclusionPatterns());
+            FileOperator.getAllJSFiles(rootFile, lists, exclusionPatternsChar);
 
             // Add tempfolder's js files
             rootFile = new File(FileOperator.TEMPFOLDER);
             if (isPathValid(rootFile, false)) {
-                FileOperator.getAllJSFiles(rootFile, lists);
+                FileOperator.getAllJSFiles(rootFile, lists,exclusionPatternsChar);
             }
+            
+            
+ 
+            
         }
         return lists;
     }
@@ -374,6 +389,7 @@ public class ArgumentsParser {
 
         // Step4: handle build path
         handleBuildPath(commandLine, conf);
+        
 
         // Step5: handle bootstrap path
         handleBootPath(commandLine, conf);
@@ -398,10 +414,28 @@ public class ArgumentsParser {
 
         // Step13: handle export function
         handleExportFunction(commandLine, conf);
+        
+        // Step 14 handle exclusion rules
+        handleExclusionRules(commandLine, conf);
+        
         return conf;
     }
 
-    /**
+    private static void handleExclusionRules(CommandLine commandLine,
+			HeadlessParserConfigure conf) {
+    	  String value = commandLine.getOptionValue(EXCLUSION_RULE);
+          if (value == null)
+              return;
+          String[] rules = value.split(",");
+          List<String> ruleList = new ArrayList<String>(rules.length);
+          for(String rule :rules){
+        	 ruleList.add(rule);
+      
+          }
+          conf.setExclusionPatterns(ruleList);
+	}
+
+	/**
      * Handle import validation policy function.
      * 
      * @param commandLine
@@ -581,6 +615,9 @@ public class ArgumentsParser {
      */
     private static void handleValidatedJSFiles(HeadlessParserConfigure conf) {
         conf.appendValidatedJSFiles(getAllValidateJSFiles(conf));
+        
+        
+        
     }
 
     /**

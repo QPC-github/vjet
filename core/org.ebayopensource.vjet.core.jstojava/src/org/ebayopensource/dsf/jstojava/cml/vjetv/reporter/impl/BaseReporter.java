@@ -60,10 +60,10 @@ public class BaseReporter implements IHeadLessReporter {
         if (conf.getReportPath() == null)
             return;
 
-        if (conf.getReprotType().equalsIgnoreCase(
+        if (conf.getReportType().equalsIgnoreCase(
                 IHeadlessLauncherConfigure.TXT)) {
             generateReportFileViaTxt(result, conf, (EVLauncherResult) result);
-        } else if (conf.getReprotType().equalsIgnoreCase(
+        } else if (conf.getReportType().equalsIgnoreCase(
                 IHeadlessLauncherConfigure.XML)) {
             XMLReportGenerator.generateXMLFile(conf, (EVLauncherResult) result); 
         }
