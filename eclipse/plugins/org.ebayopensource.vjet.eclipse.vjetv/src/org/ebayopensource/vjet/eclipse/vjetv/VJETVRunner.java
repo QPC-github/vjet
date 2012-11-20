@@ -45,22 +45,7 @@ public class VJETVRunner implements IApplication {
     @Override
     public Object start(IApplicationContext context) throws Exception {
 
-        ClassLoader orginalLoader = Thread.currentThread()
-                .getContextClassLoader();
 
-        // Step1. Prepare runtime class path, involving DSFPrebuild and so on.
-//        URL url = this.getClass().getProtectionDomain().getCodeSource()
-//                .getLocation();
-//        File coreJarFile = new File(url.getFile());
-//        String installFolderPath = coreJarFile.getAbsolutePath();
-//        installFolderPath = installFolderPath.substring(0, installFolderPath
-//                .lastIndexOf(File.separator));
-//        File installFolder = new File(installFolderPath);
-//        File[] files = installFolder.listFiles();
-//        ArrayList<URL> fileURL = new ArrayList<URL>();
-//        for (int i = 0; i < files.length; i++) {
-//            fileURL.add(files[i].toURL());
-//        }
 
         
         //Step3 run VJETV
@@ -88,17 +73,17 @@ public class VJETVRunner implements IApplication {
             Object o = contextArguments
                     .get(IApplicationContext.APPLICATION_ARGS);
             String[] args = (String[]) o;
-            if (args[0].equalsIgnoreCase("-showlocation")) {
+            
+            if (args.length>0 && args[0].equalsIgnoreCase("-showlocation")) {
                 String[] actualArgs = new String[args.length - 1];
                 System.arraycopy(args, 1, actualArgs, 0, actualArgs.length);
-                vjetvEntry.runVjetv(actualArgs);
+              
+                vjetvEntry.main(actualArgs);
             } else {
-            	 vjetvEntry.runVjetv(args);
+            	 vjetvEntry.main(args);
             }
         } catch (Exception e) {
-        	e.printStackTrace();
-        } finally {
-            Thread.currentThread().setContextClassLoader(orginalLoader);
+        	 System.exit(1);
         }
         return null;
     }
@@ -133,12 +118,6 @@ public class VJETVRunner implements IApplication {
             }
         }
         return null;
-    }
-
-    public static void main(String[] args) {
-        File s = new File("C:/Eric/views/View_RA/v3jars/v4/VjoJavaLib");
-        File v = getFileFromFolder("VjoJavaLib.jar", s);
-        System.out.println(v.getAbsolutePath());
     }
 
     /*
