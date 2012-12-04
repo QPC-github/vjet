@@ -12,8 +12,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -131,9 +133,17 @@ public class VjoJstTypeLoader implements IJstTypeLoader {
 	private File getGroupSrcFolder(String groupPath, String srcPath) {
 
 		if (groupPath != null) {
+			
+			try {
+				groupPath = URLDecoder.decode(groupPath, "utf-8");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			File groupFile = new File(groupPath);
 
-			if (groupFile.exists()) {
+			if (groupFile.getAbsoluteFile().exists()) {
 				if (!groupFile.isDirectory() || srcPath == null) {
 					return groupFile;
 				} else {

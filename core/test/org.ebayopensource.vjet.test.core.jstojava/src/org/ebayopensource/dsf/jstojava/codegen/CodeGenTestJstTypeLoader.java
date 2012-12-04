@@ -10,7 +10,9 @@ package org.ebayopensource.dsf.jstojava.codegen;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -113,6 +115,14 @@ public class CodeGenTestJstTypeLoader extends DefaultJstTypeLoader {
 			URL url = this.getClass().getResource(groupPath+srcPath);
 			if(groupPath.endsWith("!/")){
 				groupPath = groupPath.substring(0, groupPath.indexOf("!/"));
+			}
+			
+			// handle spaces or other utf-8 chars
+			try {
+				groupPath = URLDecoder.decode(groupPath, "utf-8");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 			File groupFile = new File(groupPath);
 			
