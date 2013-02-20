@@ -1,8 +1,0 @@
-vjo.ctype('a.b.C') //< public
-.protos({
-    //> public void foo(T1, )
-    foo:function(){
-    }
-   
-})
-.endType();

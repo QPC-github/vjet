@@ -1,8 +1,0 @@
-vjo.ctype('a.b.C')
-.protos({
-    a:function(){
-       var x = 10; //<Number
-       x = "String" //<String
-    }
-})
-.endType();

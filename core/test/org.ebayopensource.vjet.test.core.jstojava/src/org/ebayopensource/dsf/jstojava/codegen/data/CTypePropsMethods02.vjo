@@ -1,8 +1,0 @@
-vjo.ctype("vjo.a.b.CTypePropsMethods02")
-.props({
-   //2
-   //> public short foo2()          
-   foo2: function() {
-      return 0;
-   } 
-})

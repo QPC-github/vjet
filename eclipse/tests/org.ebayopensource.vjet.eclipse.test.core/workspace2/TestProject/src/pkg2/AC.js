@@ -1,1 +1,0 @@
-vjo.ctype("pkg2.AC");

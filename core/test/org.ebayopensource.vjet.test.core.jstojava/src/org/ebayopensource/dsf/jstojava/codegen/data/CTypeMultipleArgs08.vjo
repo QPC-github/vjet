@@ -1,9 +1,0 @@
-vjo.ctype("vjo.a.b.CTypeMultipleArgs08")
-.protos({
-   //8
-   //multiple arg followed by one optional arg
-   //> public void foo8( {Character|Short} arg0, Integer? arg])
-   foo8: function(arg0,arg1) {
-   }
-})
-.endType();

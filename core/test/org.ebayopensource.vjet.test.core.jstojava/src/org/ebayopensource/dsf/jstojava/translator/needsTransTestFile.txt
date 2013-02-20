@@ -1,2 +1,0 @@
-vjo.needs("a.b.c.Z");
-vjo.ctype("org.ebayopensource.dsf.tests.jsast.parser.simplevjo");

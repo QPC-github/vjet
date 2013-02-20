@@ -1,6 +1,0 @@
-vjo.ctype('a.b.c.D')
-.satisfies('[A,B,C]')
-.inherits('[D,E]')
-.props({})
-.protos({})
-.endType();

@@ -1,9 +1,0 @@
-vjo.ctype('a.b.C')
-.protos({
-	a:function(){
-	
-	}
-})
-.props({})
-.inits(function(){})
-.endType();

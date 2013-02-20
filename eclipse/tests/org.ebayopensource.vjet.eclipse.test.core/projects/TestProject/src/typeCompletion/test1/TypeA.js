@@ -1,1 +1,0 @@
-vjo.type("typeCompletion.test1.TypeA");

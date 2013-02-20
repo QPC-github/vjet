@@ -1,8 +1,0 @@
-vjo.ctype('org.ebayopensource.dsf.vjolang.feature.tests.comments.SimpleDynamic') //< public dynamic
-//> needs a.b.C
-.props({
-    //> public void needs(String foo)
-    needs:function(foo){
-    }
-})
-.endType();

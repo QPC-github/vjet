@@ -1,6 +1,0 @@
-vjo.ctype("org.ebayopensource.dsf.tests.jsast.parser.simplevjo")
-.protos({
-	doIt:function(){
-		var expr = a+b/c+get().myName.name.method(a,b+7)+(s/f);
-	}
-});

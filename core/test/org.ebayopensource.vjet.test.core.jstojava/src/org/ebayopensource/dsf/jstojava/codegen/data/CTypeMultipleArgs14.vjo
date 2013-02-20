@@ -1,8 +1,0 @@
-vjo.ctype("vjo.a.b.CTypeMultipleArgs14")
-.protos({
-   //14
-   //2 multiple args with wrappers
-   //> public void foo14( {boolean|int} arg0, {Integer|Boolean} arg1 )
-   foo14: function(arg0,arg1) {
-   }
-})

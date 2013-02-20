@@ -1,4 +1,0 @@
-vjo.ctype('a.b.c.D')
-.protos({})
-.props({})
-.inits(function(){  var x = a.b.c.X.doIt().myProp;  });

@@ -1,8 +1,0 @@
-vjo.ctype("vjo.a.b.CTypeMultipleArgs04")
-.protos({
-   //4
-   //multiple arg of itself as a primitive and as a wrapper
-   //> public void foo4({int|Integer} arg0)
-   foo4: function(arg0) {
-   }
-})

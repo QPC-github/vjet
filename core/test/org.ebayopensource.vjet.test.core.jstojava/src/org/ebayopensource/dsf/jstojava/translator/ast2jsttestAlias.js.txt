@@ -1,9 +1,0 @@
-vjo.ctype('a.b.c.MyType')
-.needs('a.b.c.Test')
-.needs('b.f.g.Test','MyTest')
-.protos({
-	doIt : function () {
-		//is the same as b.f.g.Test.doSomething();
-		vjo.$ns(this).MyTest.doSomething();
-	}
-});

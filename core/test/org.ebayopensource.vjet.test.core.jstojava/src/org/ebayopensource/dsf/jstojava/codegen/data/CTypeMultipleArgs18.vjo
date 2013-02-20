@@ -1,8 +1,0 @@
-vjo.ctype("vjo.a.b.CTypeMultipleArgs18")
-.props({
-	//18
-	//multiple arg, both of which are arrays
-	//> public void foo18( {String[]|Date[]} arg0)
-	foo18: function(arg0) {
-	}
-})

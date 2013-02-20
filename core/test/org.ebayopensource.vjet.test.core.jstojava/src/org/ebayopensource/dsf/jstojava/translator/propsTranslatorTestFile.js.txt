@@ -1,8 +1,0 @@
-vjo.props({
-
- sPropOne:"Static Default",
-
- sPropTwo:42,
-
- doIt:function(arg){}
-});

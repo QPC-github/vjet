@@ -1,3 +1,0 @@
-/* @org.ebayopensource.dsf.resource.utils.CodeGen("VjoGenerator") */
-vjo.ctype('org.ebayopensource.dsf.javatojs.tests.data.filter.ExcludeAll') //< public
-.endType();

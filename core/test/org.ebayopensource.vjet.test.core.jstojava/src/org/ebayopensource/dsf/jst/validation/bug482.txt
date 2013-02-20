@@ -1,3 +1,0 @@
-vjo.mtype('vjo.MType')
-.mixin('vjo.MType2')
-.endType();

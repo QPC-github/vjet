@@ -1,8 +1,0 @@
-vjo.needs("org.ebayopensource.dsf.dap.rt.DapCtx");
-vjo.type("org.ebayopensource.dsf.javatojs.tests.data.C")
-.protos({
-    //> public Window getWindow()
-    getWindow:function(){
-        return DapCtx.ctx().getWindow();
-    }
-})

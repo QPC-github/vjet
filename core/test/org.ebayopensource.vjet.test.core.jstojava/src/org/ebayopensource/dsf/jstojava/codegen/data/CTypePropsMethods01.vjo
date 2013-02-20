@@ -1,8 +1,0 @@
-vjo.ctype("vjo.a.b.CTypePropsMethods01")
-.props({
-   //1
-   //> final char foo1()             
-   foo1: function() {    
-      return 'a';
-   }
-})

@@ -1,3 +1,0 @@
-vjo.etype('a.b.c.MyVjoType2') //< public
-.values('')
-.endType();

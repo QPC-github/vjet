@@ -1,8 +1,0 @@
-vjo.ctype("vjo.a.b.CTypePropsMethods09")
-.props({
-   //9
-   //> private final boolean foo9()  
-   foo9: function() {
-      return "false";
-   } 
-})

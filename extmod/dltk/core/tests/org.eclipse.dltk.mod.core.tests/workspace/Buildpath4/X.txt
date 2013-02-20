@@ -1,3 +1,0 @@
-public class X {
-  //this content is never used
-}

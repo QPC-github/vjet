@@ -1,7 +1,0 @@
-vjo.ctype("vjo.a.b.CTypePropsMethodsArgs03")
-.props({
-   //3
-   //> public void foo3(String arg0, int arg1)  
-   foo3: function(arg0, arg1) {    
-   }
-})

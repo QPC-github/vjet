@@ -1,6 +1,0 @@
-vjo.ctype('vjo.vjet.Sample2') //< public
-.needs('vjo.vjet.Sample2')
-.inits(function(){
-        this.       
-})
-.endType();

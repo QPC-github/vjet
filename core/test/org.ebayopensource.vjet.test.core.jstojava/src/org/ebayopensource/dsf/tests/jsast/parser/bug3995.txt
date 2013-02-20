@@ -1,9 +1,0 @@
-vjo.itype('Inheritance.xx') //< public
-.inherits('a.b.c.vjo1')
-.inherits('test.test7')
-.satisfies('mixinCompletion.test0')
-.props({
-    //> public void s()
-    s:function(){
-    }
-}).b

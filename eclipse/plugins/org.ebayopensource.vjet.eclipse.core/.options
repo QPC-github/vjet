@@ -1,5 +1,0 @@
-org.ebayopensource.vjet.eclipse.core/typespace = false
-org.ebayopensource.vjet.eclipse.core/debug = false
-org.ebayopensource.vjet.eclipse.core/debugScriptBuilder = false
-org.ebayopensource.vjet.eclipse.core/traceScriptBuilder = false
-org.ebayopensource.vjet.eclipse.core/traceParser = false

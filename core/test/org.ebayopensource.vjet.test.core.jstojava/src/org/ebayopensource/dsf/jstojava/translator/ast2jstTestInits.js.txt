@@ -1,3 +1,0 @@
-vjo.ctype("vjo.darwin.app.MyClass").inits(function () {
-     vjo.darwin.app.MyClass = new vjo.darwin.app.MyClass(); 
-});

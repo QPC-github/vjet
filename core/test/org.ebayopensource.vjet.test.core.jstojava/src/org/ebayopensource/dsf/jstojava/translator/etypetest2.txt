@@ -1,6 +1,0 @@
-vjo.etype('com.ebay.EType1') //< public
-.values({
-    MON:[]
-    })
-.endType();
-    

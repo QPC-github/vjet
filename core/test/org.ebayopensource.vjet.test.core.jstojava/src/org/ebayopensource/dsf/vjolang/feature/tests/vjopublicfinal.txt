@@ -1,6 +1,0 @@
-// for bug 488
-vjo.ctype("vjo.a.b.CFoo")
-.props({
-   //> final public int count
-   count: 0
-})

@@ -1,8 +1,0 @@
-vjo.ctype("org.ebayopensource.dsf.tests.jsast.parser.devtests.NeedsMulti")
-.needs(["v4.vjo.rt.simple.A","v4.vjo.rt.simple.B"])
-.props({
-	main : function (args) {
-		this.vjo.A.doA();
-		this.vjo.B.doB();
-	}
-})

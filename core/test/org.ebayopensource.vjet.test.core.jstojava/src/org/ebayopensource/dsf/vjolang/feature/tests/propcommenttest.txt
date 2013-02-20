@@ -1,6 +1,0 @@
-vjo.ctype('parent.StaticPropAdvisorTest') //< public
-.props({
- sprop1 : 20, //< public int sprop1
- sprop2 : null //< public StaticPropAdvisorTest
-})
-.endType();

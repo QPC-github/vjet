@@ -1,9 +1,0 @@
-vjo.otype('vjo.optionsOL')
-.defs({
-	opts:{
-		autoConstruct:null, //< boolean?
-		metatype:null, //< boolean?
-		runtimeJS:null //< String[]?
-	}
-})
-.endType();

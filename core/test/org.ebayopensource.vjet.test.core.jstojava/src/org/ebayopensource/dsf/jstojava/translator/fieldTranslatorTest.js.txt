@@ -1,9 +1,0 @@
-vjo.ctype("org.ebayopensource.dsf.tests.jsast.parser.simplevjo")
-.props({
-	//>private int a
-	a : 8
-})
-.protos({
-	//>public String b
-  	b : 5
-});

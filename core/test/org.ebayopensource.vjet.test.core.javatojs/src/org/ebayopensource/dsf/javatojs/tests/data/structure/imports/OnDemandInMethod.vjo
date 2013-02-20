@@ -1,9 +1,0 @@
-/* @org.ebayopensource.dsf.resource.utils.CodeGen("VjoGenerator") */
-vjo.ctype('org.ebayopensource.dsf.javatojs.tests.data.structure.imports.OnDemandInMethod') //< public
-//> needs org.ebayopensource.dsf.javatojs.tests.data.Super
-.protos({
-    //> public void foo(Super s)
-    foo:function(s){
-    }
-})
-.endType();

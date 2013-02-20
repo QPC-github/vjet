@@ -1,7 +1,0 @@
-vjo.type('a.b.c.A')
-.endType();
-vjo.type('a.b.c.A')
-.endType();
-
-vjo.type('window')
-.endType();

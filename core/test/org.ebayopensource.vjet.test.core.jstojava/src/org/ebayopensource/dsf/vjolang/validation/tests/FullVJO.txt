@@ -1,5 +1,0 @@
-vjo.ctype("a.b.Type")
-.satisfies("b.c.IType")
-.props({a:234})
-.protos({b:234})
-.endType();

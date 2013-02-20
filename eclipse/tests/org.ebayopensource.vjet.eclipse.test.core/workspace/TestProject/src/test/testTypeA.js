@@ -1,1 +1,0 @@
-vjo.type("test.testTypeA");

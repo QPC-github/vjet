@@ -1,9 +1,0 @@
-vjo.ctype('engine.NativeTypeTest') //< public
-.protos({
-	//>private Object cdc() 
-	cdc : function(){
-		alert(this.)//abc
-	}
-	
-	
-}).endType();

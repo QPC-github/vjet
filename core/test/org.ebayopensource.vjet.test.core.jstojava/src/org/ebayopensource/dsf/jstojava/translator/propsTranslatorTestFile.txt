@@ -1,9 +1,0 @@
-vjo.ctype("org.ebayopensource.dsf.tests.jsast.parser.simplevjo")
-.props({
-
- sPropOne:"Static Default",
-
- sPropTwo:42,
-//> public void doIt(String arg)
- doIt:function(arg){}
-});

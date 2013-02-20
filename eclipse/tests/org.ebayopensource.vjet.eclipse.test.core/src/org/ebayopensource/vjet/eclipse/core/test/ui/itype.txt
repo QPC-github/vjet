@@ -1,9 +1,0 @@
-vjo.itype('I') //< public
-
-.props({
-	
-})
-.protos({
-	
-})
-.endType();

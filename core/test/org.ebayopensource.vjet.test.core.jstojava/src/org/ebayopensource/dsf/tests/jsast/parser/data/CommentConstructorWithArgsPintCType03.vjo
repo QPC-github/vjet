@@ -1,9 +1,0 @@
-vjo.ctype("org.ebayopensource.dsf.tests.jsast.parser.data.CommentConstructorWithArgsPintCType03")
-.protos({
-   //3
-   //> constructs(int arg0, int arg1)
-   constructs: function(arg0,arg1) {
-   }
-})
-
-

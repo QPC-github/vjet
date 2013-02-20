@@ -1,9 +1,0 @@
-vjo.ctype("vjo.a.b.CTypeMultipleArgs00")
-.protos({
-   //0
-   //multiple arg of itself
-   //> public void foo0({boolean} arg0)
-   foo0: function(arg0) {
-   }
-})
-.endType();

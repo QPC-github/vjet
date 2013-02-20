@@ -1,7 +1,0 @@
-vjo.ctype("org.ebayopensource.dsf.tests.jsast.parser.simplevjo")
-.protos({
- 	//> public String constructs();
-	constructs:function(arg1){
-	 	return ("Hello, have a nice day!");
-	}
-});

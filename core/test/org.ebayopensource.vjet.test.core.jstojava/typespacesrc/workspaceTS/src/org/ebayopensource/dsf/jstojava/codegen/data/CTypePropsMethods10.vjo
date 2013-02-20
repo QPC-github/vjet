@@ -1,7 +1,0 @@
-vjo.ctype("vjo.a.b.CTypePropsMethods10")
-.props({
-   //10
-   //>public final  void foo10()    
-   foo10: function() {
-   } 
-})

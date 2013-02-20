@@ -1,6 +1,0 @@
-vjo.ctype("vjo.a.b.CTypePropsVars07")
-.props({
-   //7                  
-   //> final private Float count7      
-   count7: 0.0
-})

@@ -1,9 +1,0 @@
-vjo.ctype("org.ebayopensource.dsf.tests.jsast.parser.data.GlobalVarByAttributedTypeSemanticError")
-.globals({
-	funLocal : null//<this.vj$.LocalVarByAttributedTypeSemanticError:stringAttribute
-	,
-	objLocal : null//<document:stringAttribute
-})
-.endType();
-
-

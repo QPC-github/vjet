@@ -1,4 +1,0 @@
-vjo.needs("com.lohika.ua.Test");
-vjo.needs("vjo.darwin.app1.MyClass1");
-vjo.needs("vjo.coca.cola.Kaka");
-vjo.ctype("vjo.darwin.app.MyClass");

@@ -1,4 +1,0 @@
-function doIt(){
-	window.alert("test");
-	window.blur()
-}

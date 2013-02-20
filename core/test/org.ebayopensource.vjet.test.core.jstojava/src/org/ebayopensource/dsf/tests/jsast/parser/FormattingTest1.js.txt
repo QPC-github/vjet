@@ -1,9 +1,0 @@
-vjo.ctype('org.ebayopensource.dsf.tests.jsast.parser.FormattingTest1').props({
-
-        //>public void main(String[] args)
-        main : function() {
-                if(isIn)
-        }
-
-})
-.endType();

@@ -1,6 +1,0 @@
-vjo.ctype('a.b.c.Foo1') //< public
-.props({
-    x:undefined //< int final
-
-})
-.endType();

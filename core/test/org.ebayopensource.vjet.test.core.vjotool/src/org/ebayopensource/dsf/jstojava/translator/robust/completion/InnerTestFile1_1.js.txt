@@ -1,9 +1,0 @@
-vjo.ctype('javaone.dlc.Test') //< public
-.props({
-  //>public
-  doIt : vjo.ctype()
-        .protos({
-                d:vjo.  // expected vjo.NEEDS_IMPL to be available
-        })
-})
-.endType();

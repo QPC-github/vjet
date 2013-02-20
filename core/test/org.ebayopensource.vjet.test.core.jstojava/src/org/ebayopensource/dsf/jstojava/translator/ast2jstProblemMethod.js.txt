@@ -1,9 +1,0 @@
-vjo.ctype("test.test").protos({
-
-jjj : function(hhhh,hhhh,yyy){
-},
-gg :  function (param,test) {
-	hoo(,)   	
-},
-
-})

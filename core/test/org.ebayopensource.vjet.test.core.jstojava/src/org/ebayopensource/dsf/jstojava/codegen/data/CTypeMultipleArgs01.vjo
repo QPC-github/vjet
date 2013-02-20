@@ -1,8 +1,0 @@
-vjo.ctype("vjo.a.b.CTypeMultipleArgs01")
-.protos({
-   //1
-   //multiple arg of itself as a primitive
-   //> public void foo1({char} arg0)
-   foo1: function(arg0) {
-   }
-})

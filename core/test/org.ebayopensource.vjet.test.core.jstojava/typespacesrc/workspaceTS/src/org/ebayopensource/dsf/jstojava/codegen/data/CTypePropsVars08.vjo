@@ -1,6 +1,0 @@
-vjo.ctype("vjo.a.b.CTypePropsVars08")
-.props({
-   //8
-   //> protected double count8         
-   count8: 0.0
-})

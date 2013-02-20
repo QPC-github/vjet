@@ -1,9 +1,0 @@
-vjo.needs("org.ebayopensource.dsf.javatojs.tests.data.B");
-vjo.type("org.ebayopensource.dsf.javatojs.tests.data.A")
-.inherits("org.ebayopensource.dsf.javatojs.tests.data.B")
-.protos({
-    //> public B getB()
-    getB:function(){
-        return new org.ebayopensource.dsf.javatojs.tests.data.B();
-    }
-})

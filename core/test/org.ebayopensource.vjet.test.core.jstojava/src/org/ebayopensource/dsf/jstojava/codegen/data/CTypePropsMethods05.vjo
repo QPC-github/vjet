@@ -1,8 +1,0 @@
-vjo.ctype("vjo.a.b.CTypePropsMethods05")
-.props({
-   //5
-   //> private long foo5()           
-   foo5: function() {
-      return 0L;
-   } 
-})

@@ -1,9 +1,0 @@
-vjo.mtype("org.ebayopensource.dsf.jst.validation.vjo.rt.mtype.MType")
-.needs("org.ebayopensource.dsf.jst.validation.vjo.rt.ctype.UtilCType")
-.satisfies("org.ebayopensource.dsf.jst.validation.vjo.rt.itype.BaseIType")
-.expects("org.ebayopensource.dsf.jst.validation.vjo.rt.itype.IType")
-.props({
-})
-.protos({
-})
-.endType();

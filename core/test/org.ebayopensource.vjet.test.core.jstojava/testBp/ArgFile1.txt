@@ -1,5 +1,0 @@
-testFiles//access//dollar
-
--bp    
-
-testBp

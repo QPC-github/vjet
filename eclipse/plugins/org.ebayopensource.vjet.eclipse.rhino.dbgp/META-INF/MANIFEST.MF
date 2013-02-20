@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Vendor: %providerName
-Bundle-Name: %pluginName
-Bundle-SymbolicName: org.ebayopensource.vjet.eclipse.rhino.dbgp
-Bundle-Version: 1.0.0.qualifier
-Require-Bundle: org.ebayopensource.vjet.rt.wrapper;visibility:=reexport

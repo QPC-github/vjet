@@ -1,1 +1,0 @@
-vjo.ctype("p1.Test").satisfies("p3.ITest").satisfies("p0.IBase");

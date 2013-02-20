@@ -1,1 +1,0 @@
-vjo.type("typeCompletion.test2.TypeD");

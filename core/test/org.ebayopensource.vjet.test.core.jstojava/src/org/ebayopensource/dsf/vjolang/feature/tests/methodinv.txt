@@ -1,6 +1,0 @@
-vjo.ctype("a.b.c.D")
-.protos({
-	constructs:function(){
-		var x= a.b.c.D.doIt();
-	}
-});

@@ -1,7 +1,0 @@
-/* @org.ebayopensource.dsf.resource.utils.CodeGen("VjoGenerator") */
-vjo.ctype('org.ebayopensource.dsf.javatojs.tests.data.filter.ExcludeRest') //< public
-.props({
-    EnumB:vjo.etype() //< public
-    .endType()
-})
-.endType();

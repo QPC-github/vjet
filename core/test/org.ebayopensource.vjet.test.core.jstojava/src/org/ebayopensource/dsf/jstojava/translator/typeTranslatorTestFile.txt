@@ -1,9 +1,0 @@
-vjo.atype("mrp.BaseCapability")
-.props({
-    getRate: function() { },  //< protected abstract double
-    //> public abstract double getDiscount(int age) 
-    getDiscount: function(age) { }
-})
-.protos({
-    chase: function(level) { } //< public abstract void chase(int level)
-});

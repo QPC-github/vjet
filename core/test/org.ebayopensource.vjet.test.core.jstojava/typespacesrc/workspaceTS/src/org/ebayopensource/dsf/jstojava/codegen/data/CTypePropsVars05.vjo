@@ -1,6 +1,0 @@
-vjo.ctype("vjo.a.b.CTypePropsVars05")
-.props({
-   //5
-   //> private long count5            
-   count5: 0
-})

@@ -1,4 +1,0 @@
-var a;
-vjo.ctype('vjo.vjet.Sample') //< public
-.p
-.endType();

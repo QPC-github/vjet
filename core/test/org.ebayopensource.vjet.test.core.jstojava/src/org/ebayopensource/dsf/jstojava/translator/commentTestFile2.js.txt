@@ -1,4 +1,0 @@
-vjo.ctype("org.ebayopensource.dsf.tests.jsast.parser.simplevjo")
-.props({
-	foo:vjo.DEF //< A:bar
-});

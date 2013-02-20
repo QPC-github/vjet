@@ -1,8 +1,0 @@
-vjo.needs("org.ebayopensource.dsf.javatojs.tests.data.C");
-vjo.type("org.ebayopensource.dsf.javatojs.tests.data.multipass.E")
-.protos({
-    //> public C createC()
-    createC:function(){
-        return new org.ebayopensource.dsf.javatojs.tests.data.C();
-    }
-});

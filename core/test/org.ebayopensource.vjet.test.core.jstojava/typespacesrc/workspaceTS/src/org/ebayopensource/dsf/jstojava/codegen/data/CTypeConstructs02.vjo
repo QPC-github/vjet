@@ -1,7 +1,0 @@
-vjo.ctype("vjo.a.b.CTypeConstructs02")
-.protos({
-   //2
-   //> public constructs(int? oarg0)  
-   constructs: function(oarg0) {
-   }
-})

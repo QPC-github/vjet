@@ -1,6 +1,0 @@
-vjo.ctype("vjo.a.b.CTypePropsVars09")
-.props({
-   //9
-   //> protected final boolean count9 
-   count9: "false"
-})

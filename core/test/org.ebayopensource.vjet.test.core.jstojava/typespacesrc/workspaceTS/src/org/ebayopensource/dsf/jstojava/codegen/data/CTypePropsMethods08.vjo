@@ -1,8 +1,0 @@
-vjo.ctype("vjo.a.b.CTypePropsMethods08")
-.props({
-   //8
-   //> protected double foo8()       
-   foo8: function() {
-      return 0.0d;
-   } 
-})

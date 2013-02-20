@@ -1,4 +1,0 @@
-/* @org.ebayopensource.dsf.resource.utils.CodeGen("VjoGenerator") */
-vjo.etype('org.ebayopensource.dsf.javatojs.tests.data.datatype.CoinSimpleEnum') //< public
-.values("PENNY, NICKEL, DIME, QUARTER")
-.endType();

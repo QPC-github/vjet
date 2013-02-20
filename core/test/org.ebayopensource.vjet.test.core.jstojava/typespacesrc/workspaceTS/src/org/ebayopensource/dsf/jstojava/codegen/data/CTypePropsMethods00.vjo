@@ -1,8 +1,0 @@
-vjo.ctype("vjo.a.b.CTypePropsMethods00")
-.props({
-   //0
-   //> boolean foo0()                
-   foo0: function() {
-      return true;
-   } 
-})

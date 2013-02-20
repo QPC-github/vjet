@@ -1,9 +1,0 @@
-vjo.ctype('a.b.c.other.GlobalPromote') //< public
-.globals({
-	Foo1: 12,
-	Foo2 : undefined, //<< Number::valueOf
-	Foo3 : null, //<< Number
-	Foo4 : undefined  //<< Number::NaN
-	
-})
-.endType();
