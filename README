@@ -18,46 +18,5 @@ Syntax and Semantic Checking
 Type Declarations using VJETDoc
 Execution/Debugging
 
-Learn more about VJET Js IDE here - https://www.ebayopensource.org/index.php/VJET/HomePage
-
-VJET repository consists of the following components:
-  
-  1. VJET core - 
-		a. Jst Typespace provides indexing and queryies for all JavaScript types.
-		b. JST a higher level AST that understands VJET VJO, Free form JavaScript and VJET Doc
-		c. Browser SDK - Java interfaces and annotations for describing the multiple browser JavaScript apis 
-		d. Browser Dom syncing.
-		e. JSDT forked AST parser minus Eclipse resource dependencies or JSDT inference engine.
-		f. Vjo Generator - a generator for generating VJET vjo from a Jst model
-		g. Java to Js generator translates Java from Eclipse JDT parser and translates the Java to JstType which is then generated into JS using Vjo Generator.
-
-  2. VJET eclipse - The VJET IDE for eclipse 
-		a. DLTK extension points
-		b. VJET selection engine
-		c. VJET editor
-		d. JST to DLTK light weight model translator.
-		e. VJET debug Rhino server
-		f. VJET debug integration with JDT debugger.
-		g. VJET type space viewer for Eclipse
-		h. VJET Script unit viewer for viewing the JstType and additional data in Script Unit
-		i. VJET AST View which shows the original AST and recovered AST models. 
-		j. VJET help - Eclipse help, cheatsheets.
-		k. VJET WTP HTML editor integration.
-		l. VJET VJETV a headless application that can validation javascript syntax and semantics.
-		m. VJET launching - a way to launch javascript applications in multiple ways.
-		
-  3. VJET vjo - A JavaScript library for constructing types for runtime and authoring time.
-		a. vjo.ctype - class
-		b. vjo.otype - object literal type
-		c. vjo.mtype - mixin type
-		d. vjo.itype - interface type
-		e. vjo.etype - enum type
-		f. vjo.ftype - function type
-		
-		
-  4. VJET typelibs - this is deprecated and has it's own repository.
-		.. plese see this repo - https://github.com/ebayopensource/vjet-typelib
-		
-  5. VJET dependencies - p2 repo for building Eclipse workspace.
-		a. test framework
-		b. utilities required to run VJET JS IDE.
+This project has moved to the Eclipse Foundation
+http://eclipse.org/vjet/
